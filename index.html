@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deni House Barbearia | Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <button class="brand brand-button" type="button" data-go="home" aria-label="Voltar para o início">
+          <span class="header-wordmark" aria-label="Deni House Barbearia">
+            <i>✂</i>
+            <strong>Deni House</strong>
+            <small>Barbearia</small>
+            <i class="comb">▥</i>
+          </span>
+        </button>
+        <div class="mobile-auth-actions" aria-label="Acesso rápido">
+          <button type="button" data-auth-mode="login">Entrar</button>
+          <button type="button" data-auth-mode="signup">Cadastrar</button>
+        </div>
+        <nav class="header-shortcuts" aria-label="Atalhos">
+          <button type="button" data-tab-shortcut="services"><span>⌕</span>Serviços</button>
+          <button class="header-book-button" type="button" data-scroll-services><span>◷</span>Agendar agora</button>
+          <button type="button" data-tab-shortcut="cuts"><span>▣</span>Cortes</button>
+          <button type="button" data-tab-shortcut="reviews"><span>★</span>Avaliações</button>
+          <button type="button" data-tab-shortcut="appointments"><span>□</span>Meus horários</button>
+        </nav>
+      </header>
+
+      <main>
+        <section class="view is-active" id="homeView">
+          <div class="auth-wrap">
+            <div class="auth-copy reveal">
+              <div class="script-logo" aria-label="Deni House Barbearia">
+                <span class="tool-line">✂</span>
+                <strong>Deni House</strong>
+                <small>Barbearia</small>
+                <span class="tool-line comb">▥</span>
+              </div>
+              <h1>Seu horário, do seu jeito.</h1>
+              <p>Escolha o corte, selecione o profissional e confirme em poucos passos.</p>
+            </div>
+
+            <form class="login-card reveal" id="clientLoginForm">
+              <div class="auth-tabs" role="tablist" aria-label="Acesso">
+                <button class="auth-tab active" type="button" data-auth-mode="signup">Cadastro</button>
+                <button class="auth-tab" type="button" data-auth-mode="login">Login</button>
+              </div>
+              <h2 id="authTitle">Cadastro</h2>
+              <p class="auth-helper" id="authHelper">Preencha seus dados para criar sua conta e entrar no agendamento.</p>
+              <label>
+                Nome
+                <input id="clientNameLogin" type="text" value="Lucas Almeida" placeholder="Seu nome" required />
+              </label>
+              <label>
+                Telefone ou e-mail
+                <input id="clientPhoneLogin" type="text" value="(55) 98446-2152" placeholder="(00) 9 9999-9999 ou email@email.com" required />
+              </label>
+              <label class="password-label">
+                Senha
+                <span class="password-field">
+                  <input id="clientPasswordLogin" type="password" value="123456" placeholder="Crie uma senha" required />
+                  <button id="togglePassword" type="button" aria-label="Mostrar senha">Ver</button>
+                </span>
+              </label>
+              <button class="primary-button full" id="authSubmit" type="submit">Criar conta e agendar</button>
+            </form>
+          </div>
+        </section>
+
+        <section class="view" id="clientAppView">
+          <div class="app-logo-intro" aria-label="Deni House Barbearia">
+            <span>Deni House</span>
+            <strong>Barbearia</strong>
+          </div>
+
+          <section class="section service-section tab-panel active" data-tab-panel="services">
+            <div class="service-category">
+              <aside class="service-gallery" aria-label="Cortes realizados">
+                <span>Cortes realizados</span>
+                <div class="service-photo-stack">
+                  <button class="gallery-tile tile-large" type="button" data-open-gallery aria-label="Abrir galeria de cortes">
+                    <img src="https://images.unsplash.com/photo-1517832606299-7ae9b720a186?auto=format&fit=crop&w=900&q=80" alt="Corte masculino clássico finalizado" />
+                  </button>
+                  <button class="gallery-tile tile-tall" type="button" data-open-gallery aria-label="Abrir galeria de cortes">
+                    <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=700&q=80" alt="Barbeiro alinhando o corte" />
+                  </button>
+                  <button class="gallery-tile tile-small" type="button" data-open-gallery aria-label="Abrir galeria de cortes">
+                    <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=700&q=80" alt="Cliente fazendo barba na barbearia" />
+                  </button>
+                  <button class="gallery-tile tile-more" type="button" data-open-gallery aria-label="Abrir mais 4 fotos de cortes">
+                    <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=700&q=80" alt="Atendimento premium em barbearia" />
+                    <strong>+4</strong>
+                  </button>
+                </div>
+                <p>Algumas referências para escolher o estilo antes de reservar.</p>
+              </aside>
+
+              <div class="service-menu">
+                <button class="category-head" type="button" aria-expanded="true">
+                  <span>
+                    <strong>Escolha seu serviço</strong>
+                    <small>Filtre por categoria e siga para a reserva</small>
+                  </span>
+                  <em>20 opções</em>
+                </button>
+
+                <div class="service-filters" aria-label="Categorias de serviços">
+                  <button class="active" type="button" data-service-filter="all">Todos</button>
+                  <button type="button" data-service-filter="cabelo">Cabelo</button>
+                  <button type="button" data-service-filter="barba">Barba</button>
+                  <button type="button" data-service-filter="acabamento">Acabamento</button>
+                </div>
+
+                <div class="service-list">
+                <article class="service-row" data-service="Barba" data-price="25" data-duration="30">
+                  <div>
+                    <h3>Barba</h3>
+                    <span>30min</span>
+                    <small>a partir de R$ 25,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Corte Infantil até 10 anos" data-price="35" data-duration="45">
+                  <div>
+                    <h3>Corte Infantil até 10 anos</h3>
+                    <span>45min</span>
+                    <small>a partir de R$ 35,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Degrade / Barba" data-price="65" data-duration="60">
+                  <div>
+                    <h3>Degrade / Barba</h3>
+                    <span>1h:00min</span>
+                    <small>a partir de R$ 65,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Degrade / Barba / Sobrancelha" data-price="70" data-duration="60">
+                  <div>
+                    <h3>Degrade / Barba / Sobrancelha</h3>
+                    <span>1h:00min</span>
+                    <small>a partir de R$ 70,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Degrade / Sobrancelha" data-price="45" data-duration="45">
+                  <div>
+                    <h3>Degrade / Sobrancelha</h3>
+                    <span>45min</span>
+                    <small>a partir de R$ 45,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Degrade na Barba" data-price="30" data-duration="30">
+                  <div>
+                    <h3>Degrade na Barba</h3>
+                    <span>30min</span>
+                    <small>a partir de R$ 30,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Degrade navalhado" data-price="45" data-duration="45">
+                  <div>
+                    <h3>Degrade navalhado</h3>
+                    <span>45min</span>
+                    <small>a partir de R$ 45,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Degrade tradicional" data-price="40" data-duration="40">
+                  <div>
+                    <h3>Degrade tradicional</h3>
+                    <span>40min</span>
+                    <small>a partir de R$ 40,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="High fade" data-price="40" data-duration="40">
+                  <div>
+                    <h3>High fade</h3>
+                    <span>40min</span>
+                    <small>a partir de R$ 40,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Mid fade" data-price="40" data-duration="40">
+                  <div>
+                    <h3>Mid fade</h3>
+                    <span>40min</span>
+                    <small>a partir de R$ 40,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Moica" data-price="40" data-duration="40">
+                  <div>
+                    <h3>Moica</h3>
+                    <span>40min</span>
+                    <small>a partir de R$ 40,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Mullet" data-price="40" data-duration="40">
+                  <div>
+                    <h3>Mullet</h3>
+                    <span>40min</span>
+                    <small>a partir de R$ 40,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Old money" data-price="40" data-duration="40">
+                  <div>
+                    <h3>Old money</h3>
+                    <span>40min</span>
+                    <small>a partir de R$ 40,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Sobrancelha" data-price="15" data-duration="5">
+                  <div>
+                    <h3>Sobrancelha</h3>
+                    <span>05min</span>
+                    <small>a partir de R$ 15,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Social / Barba" data-price="60" data-duration="45">
+                  <div>
+                    <h3>Social / Barba</h3>
+                    <span>45min</span>
+                    <small>a partir de R$ 60,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Social / Sobrancelha / Barba" data-price="65" data-duration="50">
+                  <div>
+                    <h3>Social / Sobrancelha / Barba</h3>
+                    <span>50min</span>
+                    <small>a partir de R$ 65,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Somente Acabamento" data-price="15" data-duration="20">
+                  <div>
+                    <h3>Somente Acabamento</h3>
+                    <span>20min</span>
+                    <small>a partir de R$ 15,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Somente Tesoura" data-price="45" data-duration="30">
+                  <div>
+                    <h3>Somente Tesoura</h3>
+                    <span>30min</span>
+                    <small>a partir de R$ 45,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Taper fade" data-price="40" data-duration="40">
+                  <div>
+                    <h3>Taper fade</h3>
+                    <span>40min</span>
+                    <small>a partir de R$ 40,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                <article class="service-row" data-service="Tradicional / Social" data-price="35" data-duration="30">
+                  <div>
+                    <h3>Tradicional / Social</h3>
+                    <span>30min</span>
+                    <small>a partir de R$ 35,00</small>
+                  </div>
+                  <button type="button">Reservar</button>
+                </article>
+                </div>
+
+                <button class="expand-services" id="toggleServices" type="button" aria-expanded="false">
+                  <span>Ver todos os serviços</span>
+                  <strong>↓</strong>
+                </button>
+
+                <footer class="service-footer">
+                  <span>Deni House Barbearia</span>
+                  <small>Atendimento com horário marcado</small>
+                </footer>
+              </div>
+            </div>
+          </section>
+
+          <section class="section tab-panel" data-tab-panel="cuts">
+            <div class="section-heading compact">
+              <span>Inspirações</span>
+              <h2>Referências de cortes para escolher seu estilo.</h2>
+            </div>
+            <div class="cut-carousel" aria-label="Carrossel de cortes">
+              <button class="carousel-arrow" type="button" data-carousel="prev">‹</button>
+              <div class="cut-track" id="cutTrack">
+                <article class="cut-card">
+                  <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=900&q=80" alt="Corte degradê em barbearia" />
+                  <strong>Degradê navalhado</strong>
+                </article>
+                <article class="cut-card">
+                  <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=900&q=80" alt="Barba alinhada em barbearia" />
+                  <strong>Barba alinhada</strong>
+                </article>
+                <article class="cut-card">
+                  <img src="https://images.unsplash.com/photo-1517832606299-7ae9b720a186?auto=format&fit=crop&w=900&q=80" alt="Corte social masculino" />
+                  <strong>Social clássico</strong>
+                </article>
+                <article class="cut-card">
+                  <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=900&q=80" alt="Atendimento em barbearia premium" />
+                  <strong>Acabamento fino</strong>
+                </article>
+              </div>
+              <button class="carousel-arrow" type="button" data-carousel="next">›</button>
+            </div>
+          </section>
+
+          <section class="section tab-panel" data-tab-panel="reviews">
+            <div class="section-heading compact">
+              <span>Avaliações</span>
+              <h2>Experiências de quem já cortou na Deni House.</h2>
+            </div>
+            <div class="reviews-grid">
+              <article class="review-card">
+                <strong>★★★★★</strong>
+                <p>Atendimento no horário, corte bem finalizado e ambiente muito bom.</p>
+                <span>Rafael Souza</span>
+              </article>
+              <article class="review-card">
+                <strong>★★★★★</strong>
+                <p>Gostei muito do degradê. Dá para ver o cuidado nos detalhes.</p>
+                <span>Bruno Martins</span>
+              </article>
+              <article class="review-card">
+                <strong>★★★★★</strong>
+                <p>Agendar ficou simples e o serviço ficou muito profissional.</p>
+                <span>João Pedro</span>
+              </article>
+            </div>
+          </section>
+
+          <section class="booking-band booking-flow-hidden" id="bookingFlow">
+            <div class="booking-panel">
+              <div class="section-heading compact">
+                <span>Reserva guiada</span>
+                <h2>Finalize seu agendamento.</h2>
+              </div>
+
+              <select id="serviceSelect" class="sr-only" aria-hidden="true">
+                <option value="Barba" data-price="25">Barba - R$ 25</option>
+                <option value="Corte Infantil até 10 anos" data-price="35">Corte Infantil até 10 anos - R$ 35</option>
+                <option value="Degrade / Barba" data-price="65">Degrade / Barba - R$ 65</option>
+                <option value="Degrade / Barba / Sobrancelha" data-price="70">Degrade / Barba / Sobrancelha - R$ 70</option>
+                <option value="Degrade / Sobrancelha" data-price="45">Degrade / Sobrancelha - R$ 45</option>
+                <option value="Degrade na Barba" data-price="30">Degrade na Barba - R$ 30</option>
+                <option value="Degrade navalhado" data-price="45">Degrade navalhado - R$ 45</option>
+                <option value="Degrade tradicional" data-price="40">Degrade tradicional - R$ 40</option>
+                <option value="High fade" data-price="40">High fade - R$ 40</option>
+                <option value="Mid fade" data-price="40">Mid fade - R$ 40</option>
+                <option value="Moica" data-price="40">Moica - R$ 40</option>
+                <option value="Mullet" data-price="40">Mullet - R$ 40</option>
+                <option value="Old money" data-price="40">Old money - R$ 40</option>
+                <option value="Sobrancelha" data-price="15">Sobrancelha - R$ 15</option>
+                <option value="Social / Barba" data-price="60">Social / Barba - R$ 60</option>
+                <option value="Social / Sobrancelha / Barba" data-price="65">Social / Sobrancelha / Barba - R$ 65</option>
+                <option value="Somente Acabamento" data-price="15">Somente Acabamento - R$ 15</option>
+                <option value="Somente Tesoura" data-price="45">Somente Tesoura - R$ 45</option>
+                <option value="Taper fade" data-price="40">Taper fade - R$ 40</option>
+                <option value="Tradicional / Social" data-price="35">Tradicional / Social - R$ 35</option>
+              </select>
+              <input id="dateInput" class="sr-only" type="date" value="2026-07-02" aria-hidden="true" />
+              <input id="timeSelect" class="sr-only" type="text" value="15:30" aria-hidden="true" />
+              <input id="nameInput" class="sr-only" type="text" value="Lucas Almeida" aria-hidden="true" />
+              <input id="phoneInput" class="sr-only" type="tel" value="(55) 98446-2152" aria-hidden="true" />
+              <input id="emailInput" class="sr-only" type="email" value="lucas@email.com" aria-hidden="true" />
+
+              <div class="booking-stepper" aria-label="Etapas do agendamento">
+                <button class="step-pill active" type="button" data-step-target="provider">1. Profissional</button>
+                <button class="step-pill locked" type="button" data-step-target="datetime" aria-disabled="true">2. Dia e horário</button>
+                <button class="step-pill locked" type="button" data-step-target="confirm" aria-disabled="true">3. Confirmar</button>
+              </div>
+
+              <div class="wizard-shell">
+                <section class="wizard-panel active" data-step="provider">
+                  <div class="wizard-copy">
+                    <span>Serviço escolhido</span>
+                    <h3 id="selectedServiceTitle">Degrade navalhado</h3>
+                    <p>Agora escolha com quem você quer cortar.</p>
+                  </div>
+
+                  <div class="professional-grid">
+                    <button class="professional-card" type="button" data-provider="Deni">
+                      <img src="https://images.unsplash.com/photo-1595152772835-219674b2a8a6?auto=format&fit=crop&w=320&q=80" alt="Profissional Deni" />
+                      <span>
+                        <strong>Deni</strong>
+                        <em>Degradê, navalhado e acabamento fino</em>
+                        <small>Horários a partir das 09:00</small>
+                      </span>
+                    </button>
+                    <button class="professional-card" type="button" data-provider="João Silveira">
+                      <img src="https://images.unsplash.com/photo-1605497788044-5a32c7078486?auto=format&fit=crop&w=320&q=80" alt="Profissional João Silveira" />
+                      <span>
+                        <strong>João Silveira</strong>
+                        <em>Cortes clássicos, social e barba</em>
+                        <small>Horários a partir das 14:00</small>
+                      </span>
+                    </button>
+                  </div>
+
+                  <div class="wizard-actions">
+                    <button class="primary-button" type="button" data-next-step="datetime">Continuar</button>
+                  </div>
+                </section>
+
+                <section class="wizard-panel" data-step="datetime">
+                  <div class="wizard-copy">
+                    <span id="providerStepLabel">Deni selecionado</span>
+                    <h3>Escolha dia e horário.</h3>
+                    <p>Os horários mudam de acordo com o profissional escolhido.</p>
+                  </div>
+
+                  <div class="date-strip" aria-label="Dias disponíveis">
+                    <button class="date-chip active" type="button" data-date="2026-07-02" data-label="02/07/2026">
+                      <span>Qui</span><strong>02</strong><small>Jul</small>
+                    </button>
+                    <button class="date-chip" type="button" data-date="2026-07-03" data-label="03/07/2026">
+                      <span>Sex</span><strong>03</strong><small>Jul</small>
+                    </button>
+                    <button class="date-chip" type="button" data-date="2026-07-05" data-label="05/07/2026">
+                      <span>Sáb</span><strong>05</strong><small>Jul</small>
+                    </button>
+                  </div>
+
+                  <div class="time-grid" id="timeSlots" aria-label="Horários disponíveis"></div>
+
+                  <div class="wizard-actions">
+                    <button class="secondary-button" type="button" data-prev-step="provider">Voltar</button>
+                    <button class="primary-button" type="button" data-next-step="confirm">Continuar</button>
+                  </div>
+                </section>
+
+                <section class="wizard-panel" data-step="confirm">
+                  <div class="booking-layout compact-booking">
+                    <div class="confirm-card">
+                      <div class="wizard-copy">
+                        <span>Última etapa</span>
+                        <h3>Escolha o pagamento.</h3>
+                      </div>
+
+                      <div class="payment-choice" role="group" aria-label="Forma de pagamento">
+                        <button class="pay-option active" type="button" data-payment="Pago antecipado">Pagar agora</button>
+                        <button class="pay-option" type="button" data-payment="Pendente no balcão">Pagar no balcão</button>
+                      </div>
+
+                      <button class="primary-button full" id="confirmButton" type="button">Confirmar agendamento</button>
+                    </div>
+
+                    <div class="booking-preview">
+                      <span class="preview-label">Resumo do horário</span>
+                      <h3 id="previewService">Degrade navalhado</h3>
+                      <div class="preview-line">
+                        <span>Você</span>
+                        <strong id="previewName">Lucas Almeida</strong>
+                      </div>
+                      <div class="preview-line">
+                        <span>Profissional</span>
+                        <strong id="previewProvider">Deni</strong>
+                      </div>
+                      <div class="preview-line">
+                        <span>Data e horário</span>
+                        <strong id="previewTime">02/07/2026 às 15:30</strong>
+                      </div>
+                      <div class="preview-line">
+                        <span>Pagamento</span>
+                        <strong id="previewPayment">Pago antecipado</strong>
+                      </div>
+                      <div class="total-box">
+                        <span>Total</span>
+                        <strong id="previewPrice">R$ 45</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="wizard-actions">
+                    <button class="secondary-button" type="button" data-prev-step="datetime">Voltar</button>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </section>
+
+          <section class="section appointments-section tab-panel" id="myAppointments" data-tab-panel="appointments">
+            <div class="section-heading compact">
+              <span>Meus agendamentos</span>
+              <h2>Veja seus próximos horários.</h2>
+            </div>
+            <div class="my-appointments-list" id="myAppointmentsList">
+              <article class="my-appointment empty">
+                <strong>Nenhum horário confirmado ainda.</strong>
+                <span>Quando você confirmar um agendamento, ele aparece aqui.</span>
+              </article>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" id="ownerDashboardView">
+          <div class="client-header owner-header">
+            <div>
+              <span class="eyebrow">Gerenciador Deni House</span>
+              <h1>Painel do Deni</h1>
+            </div>
+            <div class="header-actions">
+              <button class="ghost-button" type="button" data-go="home">Sair</button>
+            </div>
+          </div>
+
+          <section class="section dashboard-section">
+            <div class="dashboard-grid">
+              <article class="metric-card">
+                <span>Faturamento do mês</span>
+                <strong>R$ 3.840</strong>
+                <small>+18% comparado ao mês passado</small>
+              </article>
+              <article class="metric-card">
+                <span>Cortes realizados</span>
+                <strong>126</strong>
+                <small>Média de 6 clientes por dia</small>
+              </article>
+              <article class="metric-card">
+                <span>Pagos antecipadamente</span>
+                <strong id="paidTotal">R$ 1.280</strong>
+                <small>Controle do que já entrou antes do corte</small>
+              </article>
+              <article class="metric-card">
+                <span>Serviço mais vendido</span>
+                <strong>Degrade</strong>
+                <small>48% dos agendamentos</small>
+              </article>
+            </div>
+
+            <div class="owner-layout">
+              <div class="schedule-card">
+                <div class="card-title">
+                  <h3>Agenda de amanhã</h3>
+                  <span>02 jul</span>
+                </div>
+                <div class="appointment-list" id="appointmentList">
+                  <div class="appointment paid">
+                    <time>09:00</time>
+                    <div>
+                      <strong>Rafael Souza</strong>
+                      <span>Degrade navalhado</span>
+                    </div>
+                    <em>Pago</em>
+                    <small>Confirmação no dia</small>
+                  </div>
+                  <div class="appointment pending">
+                    <time>10:30</time>
+                    <div>
+                      <strong>Bruno Martins</strong>
+                      <span>Degrade / Barba</span>
+                    </div>
+                    <em>Balcão</em>
+                    <small>Confirmação no dia</small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="insight-card">
+                <div class="card-title">
+                  <h3>Serviços mais vendidos</h3>
+                  <span>tempo real</span>
+                </div>
+                <div class="bar-chart" aria-label="Gráfico de serviços vendidos">
+                  <div style="--h: 82%"><span>Degrade</span></div>
+                  <div style="--h: 58%"><span>Barba</span></div>
+                  <div style="--h: 70%"><span>Combo</span></div>
+                  <div style="--h: 45%"><span>Plano</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="analytics-grid">
+              <article class="insight-card">
+                <div class="card-title">
+                  <h3>Cortes por mês</h3>
+                  <span>últimos 6 meses</span>
+                </div>
+                <div class="trend-chart" aria-label="Gráfico de cortes por mês">
+                  <div style="--h: 52%"><strong>88</strong><span>Fev</span></div>
+                  <div style="--h: 58%"><strong>96</strong><span>Mar</span></div>
+                  <div style="--h: 63%"><strong>104</strong><span>Abr</span></div>
+                  <div style="--h: 72%"><strong>118</strong><span>Mai</span></div>
+                  <div style="--h: 76%"><strong>126</strong><span>Jun</span></div>
+                  <div style="--h: 68%"><strong>74</strong><span>Jul</span></div>
+                </div>
+              </article>
+
+              <article class="insight-card">
+                <div class="card-title">
+                  <h3>Horários de pico</h3>
+                  <span>semana atual</span>
+                </div>
+                <div class="peak-list">
+                  <div><span>09h - 11h</span><strong style="--w: 44%"></strong><em>44% de ocupação</em></div>
+                  <div><span>14h - 17h</span><strong style="--w: 71%"></strong><em>71% de ocupação</em></div>
+                  <div><span>18h - 21h</span><strong style="--w: 88%"></strong><em>88% de ocupação</em></div>
+                </div>
+              </article>
+
+              <article class="insight-card">
+                <div class="card-title">
+                  <h3>Status dos pagamentos</h3>
+                  <span>mês atual</span>
+                </div>
+                <div class="payment-donut" aria-label="Pagamentos antecipados e no balcão">
+                  <div></div>
+                  <ul>
+                    <li><span></span> Pago antecipadamente: 64%</li>
+                    <li><span></span> Pagar no balcão: 36%</li>
+                  </ul>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="section plans-section">
+            <div class="section-heading compact">
+              <span>Clientes e planos</span>
+              <h2>Controle de recorrência e oportunidades.</h2>
+            </div>
+            <div class="client-table">
+              <div class="table-row table-head">
+                <span>Cliente</span>
+                <span>Plano</span>
+                <span>Uso</span>
+                <span>Status</span>
+              </div>
+              <div class="table-row">
+                <span>Joao Pedro</span>
+                <span>Mensal</span>
+                <span>3/4 cortes</span>
+                <strong class="status active">Ativo</strong>
+              </div>
+              <div class="table-row">
+                <span>Marcos Vinicius</span>
+                <span>Mensal</span>
+                <span>4/4 cortes</span>
+                <strong class="status renew">Renovar</strong>
+              </div>
+              <div class="table-row">
+                <span>Caio Henrique</span>
+                <span>Avulso</span>
+                <span>2 visitas</span>
+                <strong class="status lead">Ofertar plano</strong>
+              </div>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <section class="completion-overlay" id="completionOverlay" aria-hidden="true">
+      <div class="completion-card">
+        <span>Agendamento confirmado</span>
+        <h2 id="completionTitle">Seu horário está reservado.</h2>
+        <p id="completionSummary">Você pode acompanhar tudo em meus agendamentos.</p>
+        <button class="primary-button full" id="viewAppointmentsButton" type="button">Ver meus agendamentos</button>
+      </div>
+    </section>
+
+    <section class="gallery-overlay" id="galleryOverlay" aria-hidden="true">
+      <div class="gallery-modal">
+        <header>
+          <span>Cortes realizados</span>
+          <button type="button" id="closeGallery">Fechar</button>
+        </header>
+        <div class="gallery-modal-grid">
+          <img src="https://images.unsplash.com/photo-1517832606299-7ae9b720a186?auto=format&fit=crop&w=900&q=80" alt="Corte masculino clássico finalizado" />
+          <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=900&q=80" alt="Barbeiro alinhando corte com pente" />
+          <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=900&q=80" alt="Barba sendo feita na barbearia" />
+          <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=900&q=80" alt="Atendimento premium em cadeira de barbearia" />
+          <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&w=900&q=80" alt="Barbeiro fazendo acabamento" />
+          <img src="https://images.unsplash.com/photo-1605497788044-5a32c7078486?auto=format&fit=crop&w=900&q=80" alt="Profissional preparando corte" />
+          <img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=900&q=80" alt="Ferramentas de barbearia organizadas" />
+          <img src="https://images.unsplash.com/photo-1622296089863-eb7fc530daa8?auto=format&fit=crop&w=900&q=80" alt="Corte degradê em detalhe" />
+        </div>
+      </div>
+    </section>
+
+    <div class="toast" id="toast">Agendamento criado e enviado para o painel do Deni.</div>
+    <script src="./script.js"></script>
+  </body>
+</html>
