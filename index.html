@@ -523,8 +523,8 @@
         <section class="view" id="ownerDashboardView">
           <div class="client-header owner-header">
             <div>
-              <span class="eyebrow">Gerenciador Deni House</span>
-              <h1>Painel da Barbearia</h1>
+              <span class="eyebrow" id="ownerDashboardEyebrow">Gerenciador Deni House</span>
+              <h1 id="ownerDashboardTitle">Painel da Barbearia</h1>
             </div>
             <div class="header-actions">
               <button class="ghost-button" type="button" data-go="home">Sair</button>
@@ -647,7 +647,7 @@
               </div>
 
               <div class="barber-summary-grid">
-                <article class="barber-card primary">
+                <article class="barber-card primary" data-barber-card="deni">
                   <div class="card-title">
                     <h3>Deni</h3>
                     <span>semana atual</span>
@@ -660,7 +660,7 @@
                   <p>Mês com mais cortes: <strong>Junho</strong>, com 74 atendimentos.</p>
                 </article>
 
-                <article class="barber-card">
+                <article class="barber-card" data-barber-card="joao">
                   <div class="card-title">
                     <h3>João</h3>
                     <span>semana atual</span>

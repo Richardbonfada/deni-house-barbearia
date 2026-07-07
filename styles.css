@@ -2239,6 +2239,13 @@ select:focus {
     rgba(8, 10, 13, 0.72);
 }
 
+.barber-card.active {
+  border-color: rgba(110, 231, 255, 0.52);
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(110, 231, 255, 0.18);
+}
+
 .barber-metrics {
   display: grid;
   grid-template-columns: 1.25fr 0.72fr 1fr;

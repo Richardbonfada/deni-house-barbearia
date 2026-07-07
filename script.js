@@ -56,6 +56,9 @@ const addServiceButton = document.querySelector("#addServiceButton");
 const addProductButton = document.querySelector("#addProductButton");
 const managedServicesList = document.querySelector("#managedServicesList");
 const managedProductsList = document.querySelector("#managedProductsList");
+const ownerDashboardTitle = document.querySelector("#ownerDashboardTitle");
+const ownerDashboardEyebrow = document.querySelector("#ownerDashboardEyebrow");
+const barberDashboardCards = document.querySelectorAll("[data-barber-card]");
 const newServiceName = document.querySelector("#newServiceName");
 const newServicePrice = document.querySelector("#newServicePrice");
 const newServiceDuration = document.querySelector("#newServiceDuration");
@@ -75,6 +78,52 @@ let hasAppointments = false;
 let maxUnlockedStep = 0;
 const stepOrder = ["provider", "datetime", "confirm"];
 document.querySelector('[data-tab-panel="services"]')?.after(bookingFlow);
+
+const barberAccess = [
+  {
+    id: "deni",
+    label: "Deni",
+    names: ["deni", "denilson"],
+    contacts: ["deni@denihouse.com"],
+    password: "denihouse",
+  },
+  {
+    id: "joao",
+    label: "João",
+    names: ["joao", "joão", "joao silveira", "joão silveira"],
+    contacts: ["joao@denihouse.com", "joao.silveira@denihouse.com"],
+    password: "joaosilveira",
+  },
+];
+
+function normalizeLoginValue(value) {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function getBarberByLogin(name, contact, password) {
+  const normalizedName = normalizeLoginValue(name);
+  const normalizedContact = normalizeLoginValue(contact);
+  const normalizedPassword = normalizeLoginValue(password);
+
+  return barberAccess.find((barber) => {
+    const canUseName = barber.names.map(normalizeLoginValue).includes(normalizedName);
+    const canUseContact = barber.contacts.map(normalizeLoginValue).includes(normalizedContact);
+    return (canUseName || canUseContact) && normalizedPassword === normalizeLoginValue(barber.password);
+  });
+}
+
+function setOwnerDashboard(barber) {
+  ownerDashboardTitle.textContent = `Painel do ${barber.label}`;
+  ownerDashboardEyebrow.textContent = `Gerenciador Deni House - acesso do ${barber.label}`;
+  document.body.dataset.ownerBarber = barber.id;
+  barberDashboardCards.forEach((card) => {
+    card.classList.toggle("active", card.dataset.barberCard === barber.id);
+  });
+}
 
 function getServiceCategory(serviceName) {
   const service = serviceName.toLowerCase();
@@ -528,13 +577,12 @@ clientLoginForm.addEventListener("submit", (event) => {
   const loginName = clientNameLogin.value.trim().toLowerCase();
   const loginContact = clientPhoneLogin.value.trim().toLowerCase();
   const loginPassword = clientPasswordLogin.value.trim().toLowerCase();
-  const isOwner =
-    (loginName === "deni" || loginName === "denilson" || loginContact === "deni@denihouse.com") &&
-    loginPassword === "denihouse";
+  const barberLogin = getBarberByLogin(loginName, loginContact, loginPassword);
 
-  if (isOwner) {
+  if (barberLogin) {
+    setOwnerDashboard(barberLogin);
     goTo("owner-dashboard");
-    showToast("Bem-vindo ao gerenciador.");
+    showToast(`Bem-vindo ao gerenciador, ${barberLogin.label}.`);
     return;
   }
 
