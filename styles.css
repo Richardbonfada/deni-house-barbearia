@@ -847,7 +847,8 @@ body[data-view="client-app"] .topbar .brand {
 .client-table,
 .barber-card,
 .weekly-table,
-.management-card {
+.management-card,
+.plan-card {
   border: 1px solid var(--line);
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025));
   box-shadow: var(--shadow);
@@ -2285,7 +2286,62 @@ select:focus {
 }
 
 .plans-section .table-row {
-  grid-template-columns: 1.2fr 1fr 0.8fr 0.8fr auto;
+  grid-template-columns: 1fr minmax(220px, 1.45fr) 0.7fr 0.72fr auto;
+}
+
+.plan-catalog {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.plan-card {
+  display: grid;
+  align-content: space-between;
+  min-height: 210px;
+  padding: 18px;
+  border-radius: 14px;
+}
+
+.plan-card.featured {
+  border-color: rgba(77, 130, 255, 0.36);
+  background:
+    linear-gradient(145deg, rgba(24, 93, 255, 0.16), rgba(255, 255, 255, 0.025)),
+    rgba(8, 10, 13, 0.72);
+}
+
+.plan-card.compact {
+  min-height: 160px;
+}
+
+.plan-card span {
+  color: #aeb9ca;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.plan-card h3 {
+  margin: 12px 0 8px;
+  color: var(--ivory);
+  font-size: 22px;
+}
+
+.plan-card p {
+  margin: 0;
+  color: #b8c3d5;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.plan-card strong {
+  display: block;
+  margin-top: 18px;
+  color: var(--cyan);
+  font-size: 28px;
+  line-height: 1;
 }
 
 .manager-form {
@@ -2586,6 +2642,10 @@ select:focus {
 
   .service-grid,
   .dashboard-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .plan-catalog {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -3225,6 +3285,32 @@ select:focus {
   body[data-view="owner-dashboard"] .barber-panel,
   body[data-view="owner-dashboard"] .management-section {
     margin-top: 12px;
+  }
+
+  body[data-view="owner-dashboard"] .plan-catalog {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  body[data-view="owner-dashboard"] .plan-card {
+    min-height: auto;
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  body[data-view="owner-dashboard"] .plan-card h3 {
+    margin: 8px 0 6px;
+    font-size: 18px;
+  }
+
+  body[data-view="owner-dashboard"] .plan-card p {
+    font-size: 12px;
+  }
+
+  body[data-view="owner-dashboard"] .plan-card strong {
+    margin-top: 12px;
+    font-size: 24px;
   }
 
   body[data-view="owner-dashboard"] .barber-metrics {

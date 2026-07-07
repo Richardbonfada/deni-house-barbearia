@@ -78,7 +78,7 @@ document.querySelector('[data-tab-panel="services"]')?.after(bookingFlow);
 
 function getServiceCategory(serviceName) {
   const service = serviceName.toLowerCase();
-  if (service.includes("sobrancelha") || service.includes("acabamento")) {
+  if (service.includes("sobrancelha") || service.includes("acabamento") || service.includes("higienização")) {
     return "acabamento";
   }
   if (service.includes("barba")) {
