@@ -25,7 +25,8 @@ const confirmButton = document.querySelector("#confirmButton");
 const selectedServiceTitle = document.querySelector("#selectedServiceTitle");
 const providerStepLabel = document.querySelector("#providerStepLabel");
 const professionalCards = document.querySelectorAll(".professional-card");
-const dateChips = document.querySelectorAll(".date-chip");
+const dateStrip = document.querySelector("#dateStrip");
+let dateChips = document.querySelectorAll(".date-chip");
 const timeSlots = document.querySelector("#timeSlots");
 const stepPills = document.querySelectorAll(".step-pill");
 const wizardPanels = document.querySelectorAll(".wizard-panel");
@@ -70,13 +71,14 @@ let authMode = "signup";
 
 let selectedPayment = "Pago antecipado";
 let selectedProvider = "";
-let selectedDateLabel = "02/07/2026";
-let selectedTime = "15:30";
+let selectedDateLabel = "";
+let selectedTime = "";
 let displayedPrice = 0;
 let priceAnimationFrame = null;
 let hasAppointments = false;
 let maxUnlockedStep = 0;
 const stepOrder = ["provider", "datetime", "confirm"];
+const appointmentsStorageKey = "deniHouseAppointments";
 document.querySelector('[data-tab-panel="services"]')?.after(bookingFlow);
 
 const barberAccess = [
@@ -125,6 +127,292 @@ function setOwnerDashboard(barber) {
   });
 }
 
+function getStoredAppointments() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(appointmentsStorageKey) || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveStoredAppointments(appointments) {
+  localStorage.setItem(appointmentsStorageKey, JSON.stringify(appointments));
+}
+
+function formatCurrency(value) {
+  return value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+}
+
+function toIsoDate(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function formatDateLabel(date) {
+  return date.toLocaleDateString("pt-BR");
+}
+
+function formatShortDate(date) {
+  return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }).replace(".", "");
+}
+
+function getCurrentWeekRange() {
+  const today = new Date();
+  const day = today.getDay() || 7;
+  const start = new Date(today);
+  start.setDate(today.getDate() - day + 1);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  return {
+    start: toIsoDate(start),
+    end: toIsoDate(end),
+    label: `${formatDateLabel(start)} a ${formatDateLabel(end)}`,
+  };
+}
+
+function isSameMonth(dateValue, reference = new Date()) {
+  const date = new Date(`${dateValue}T00:00:00`);
+  return date.getMonth() === reference.getMonth() && date.getFullYear() === reference.getFullYear();
+}
+
+function isInCurrentWeek(dateValue) {
+  const week = getCurrentWeekRange();
+  return dateValue >= week.start && dateValue <= week.end;
+}
+
+function getMonthName(dateValue) {
+  return new Date(`${dateValue}T00:00:00`).toLocaleDateString("pt-BR", { month: "long" });
+}
+
+function getAppointmentPrice(appointment) {
+  return Number(appointment.price) || 0;
+}
+
+function getBarberId(provider) {
+  return normalizeLoginValue(provider).includes("joao") ? "joao" : "deni";
+}
+
+function renderDateChips() {
+  const today = new Date();
+  const days = Array.from({ length: 5 }, (_, index) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() + index);
+    return date;
+  });
+
+  dateStrip.innerHTML = days
+    .map((date, index) => {
+      const weekday = date.toLocaleDateString("pt-BR", { weekday: "short" }).replace(".", "");
+      const month = date.toLocaleDateString("pt-BR", { month: "short" }).replace(".", "");
+      return `
+        <button class="date-chip${index === 0 ? " active" : ""}" type="button" data-date="${toIsoDate(date)}" data-label="${formatDateLabel(date)}">
+          <span>${weekday}</span><strong>${String(date.getDate()).padStart(2, "0")}</strong><small>${month}</small>
+        </button>
+      `;
+    })
+    .join("");
+
+  dateChips = document.querySelectorAll(".date-chip");
+  const firstDate = days[0];
+  dateInput.value = toIsoDate(firstDate);
+  selectedDateLabel = formatDateLabel(firstDate);
+
+  dateChips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      dateInput.value = chip.dataset.date;
+      selectedDateLabel = chip.dataset.label;
+      dateChips.forEach((item) => item.classList.remove("active"));
+      chip.classList.add("active");
+      renderTimeSlots();
+    });
+  });
+}
+
+function renderClientAppointments() {
+  const appointments = getStoredAppointments();
+  hasAppointments = appointments.length > 0;
+
+  if (!hasAppointments) {
+    myAppointmentsList.innerHTML = `
+      <article class="my-appointment empty">
+        <strong>Nenhum horário confirmado ainda.</strong>
+        <span>Quando você confirmar um agendamento, ele aparece aqui.</span>
+      </article>
+    `;
+    return;
+  }
+
+  myAppointmentsList.innerHTML = appointments
+    .slice()
+    .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))
+    .map((appointment) => `
+      <article class="my-appointment">
+        <div>
+          <strong>${appointment.service}</strong>
+          <span>${appointment.dateLabel} às ${appointment.time} com ${appointment.provider}</span>
+        </div>
+        <em>${appointment.payment === "Pago antecipado" ? "Pago antecipadamente" : "Pagar no balcão"}</em>
+      </article>
+    `)
+    .join("");
+}
+
+function renderDashboard() {
+  const appointments = getStoredAppointments();
+  const monthAppointments = appointments.filter((appointment) => isSameMonth(appointment.date));
+  const weekAppointments = appointments.filter((appointment) => isInCurrentWeek(appointment.date));
+  const monthRevenue = monthAppointments.reduce((sum, appointment) => sum + getAppointmentPrice(appointment), 0);
+  const paidRevenue = monthAppointments
+    .filter((appointment) => appointment.payment === "Pago antecipado")
+    .reduce((sum, appointment) => sum + getAppointmentPrice(appointment), 0);
+
+  const metricCards = document.querySelectorAll(".dashboard-grid .metric-card");
+  metricCards[0].querySelector("strong").textContent = formatCurrency(monthRevenue);
+  metricCards[0].querySelector("small").textContent = monthAppointments.length
+    ? "Total confirmado no mês atual"
+    : "Atualiza conforme os agendamentos confirmados";
+  metricCards[1].querySelector("strong").textContent = String(monthAppointments.length);
+  metricCards[1].querySelector("small").textContent = monthAppointments.length
+    ? `${weekAppointments.length} cortes nesta semana`
+    : "Nenhum corte confirmado ainda";
+  paidTotal.textContent = formatCurrency(paidRevenue);
+
+  const serviceCounts = monthAppointments.reduce((acc, appointment) => {
+    acc[appointment.service] = (acc[appointment.service] || 0) + 1;
+    return acc;
+  }, {});
+  const serviceRanking = Object.entries(serviceCounts).sort((a, b) => b[1] - a[1]);
+  const topService = serviceRanking[0];
+  metricCards[3].querySelector("strong").textContent = topService ? topService[0] : "Nenhum";
+  metricCards[3].querySelector("small").textContent = topService
+    ? `${topService[1]} agendamento${topService[1] > 1 ? "s" : ""} no mês`
+    : "Aparece quando houver agendamentos";
+
+  const upcoming = appointments
+    .filter((appointment) => appointment.date >= toIsoDate(new Date()))
+    .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))
+    .slice(0, 6);
+  document.querySelector(".schedule-card .card-title span").textContent = upcoming[0] ? upcoming[0].dateLabel : "Hoje";
+  appointmentList.innerHTML = upcoming.length
+    ? upcoming
+        .map((appointment) => `
+          <div class="appointment ${appointment.payment === "Pago antecipado" ? "paid" : "pending"}">
+            <time>${appointment.time}</time>
+            <div>
+              <strong>${appointment.clientName || "Cliente"}</strong>
+              <span>${appointment.service} com ${appointment.provider} - ${formatCurrency(getAppointmentPrice(appointment))}</span>
+            </div>
+            <em>${appointment.payment === "Pago antecipado" ? "Pago" : "Balcão"}</em>
+            <small>${appointment.dateLabel}</small>
+          </div>
+        `)
+        .join("")
+    : `
+      <div class="appointment empty">
+        <div>
+          <strong>Nenhum horário confirmado ainda.</strong>
+          <span>Quando o cliente agendar, aparece aqui.</span>
+        </div>
+      </div>
+    `;
+
+  const barChart = document.querySelector(".bar-chart");
+  const maxServiceCount = Math.max(...serviceRanking.map(([, count]) => count), 0);
+  barChart.innerHTML = serviceRanking.length
+    ? serviceRanking.slice(0, 4).map(([service, count]) => {
+        const height = Math.max(18, Math.round((count / maxServiceCount) * 100));
+        return `<div style="--h: ${height}%"><span>${service}</span></div>`;
+      }).join("")
+    : `<div style="--h: 8%"><span>Sem dados</span></div>`;
+
+  const currentMonth = new Date();
+  const months = Array.from({ length: 6 }, (_, index) => {
+    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - (5 - index), 1);
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    const label = date.toLocaleDateString("pt-BR", { month: "short" }).replace(".", "");
+    const count = appointments.filter((appointment) => appointment.date.startsWith(key)).length;
+    return { label, count };
+  });
+  const maxMonthCount = Math.max(...months.map((month) => month.count), 1);
+  document.querySelector(".trend-chart").innerHTML = months
+    .map((month) => `<div style="--h: ${Math.max(8, Math.round((month.count / maxMonthCount) * 100))}%"><strong>${month.count}</strong><span>${month.label}</span></div>`)
+    .join("");
+
+  const peakRanges = [
+    { label: "09h - 11h", start: 9, end: 11 },
+    { label: "14h - 17h", start: 14, end: 17 },
+    { label: "18h - 21h", start: 18, end: 21 },
+  ];
+  const peakData = peakRanges.map((range) => {
+    const count = weekAppointments.filter((appointment) => {
+      const hour = Number(appointment.time.split(":")[0]);
+      return hour >= range.start && hour <= range.end;
+    }).length;
+    return { ...range, count };
+  });
+  const maxPeak = Math.max(...peakData.map((range) => range.count), 1);
+  document.querySelector(".peak-list").innerHTML = peakData
+    .map((range) => `<div><span>${range.label}</span><strong style="--w: ${Math.round((range.count / maxPeak) * 100)}%"></strong><em>${range.count} agendamento${range.count === 1 ? "" : "s"}</em></div>`)
+    .join("");
+
+  const paidCount = monthAppointments.filter((appointment) => appointment.payment === "Pago antecipado").length;
+  const paidPercent = monthAppointments.length ? Math.round((paidCount / monthAppointments.length) * 100) : 0;
+  const pendingPercent = monthAppointments.length ? 100 - paidPercent : 0;
+  document.querySelector(".payment-donut > div").style.setProperty("--paid", `${paidPercent}%`);
+  document.querySelector(".payment-donut ul").innerHTML = `
+    <li><span></span> Pago antecipadamente: ${paidPercent}%</li>
+    <li><span></span> Pagar no balcão: ${pendingPercent}%</li>
+  `;
+
+  const week = getCurrentWeekRange();
+  document.querySelector(".weekly-table").innerHTML = `
+    <div class="table-row table-head">
+      <span>Barbeiro</span>
+      <span>Semana</span>
+      <span>Cortes</span>
+      <span>Total</span>
+    </div>
+  `;
+
+  ["Deni", "João Silveira"].forEach((provider) => {
+    const providerAppointments = weekAppointments.filter((appointment) => appointment.provider === provider);
+    const providerRevenue = providerAppointments.reduce((sum, appointment) => sum + getAppointmentPrice(appointment), 0);
+    const ticket = providerAppointments.length ? providerRevenue / providerAppointments.length : 0;
+    const barberId = getBarberId(provider);
+    const barberCard = document.querySelector(`[data-barber-card="${barberId}"]`);
+    barberCard.querySelector(".barber-metrics").innerHTML = `
+      <div><span>Total recebido</span><strong>${formatCurrency(providerRevenue)}</strong></div>
+      <div><span>Cortes</span><strong>${providerAppointments.length}</strong></div>
+      <div><span>Ticket médio</span><strong>${formatCurrency(ticket)}</strong></div>
+    `;
+
+    const monthsByBarber = appointments
+      .filter((appointment) => appointment.provider === provider)
+      .reduce((acc, appointment) => {
+        const key = `${appointment.date.slice(0, 7)}|${getMonthName(appointment.date)}`;
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {});
+    const bestMonth = Object.entries(monthsByBarber).sort((a, b) => b[1] - a[1])[0];
+    barberCard.querySelector("p").innerHTML = bestMonth
+      ? `Mês com mais cortes: <strong>${bestMonth[0].split("|")[1]}</strong>, com ${bestMonth[1]} atendimento${bestMonth[1] > 1 ? "s" : ""}.`
+      : `Mês com mais cortes: <strong>Sem dados ainda</strong>.`;
+
+    const row = document.createElement("div");
+    row.className = "table-row";
+    row.innerHTML = `
+      <span>${provider.replace(" Silveira", "")}</span>
+      <span>${week.label}</span>
+      <span>${providerAppointments.length} corte${providerAppointments.length === 1 ? "" : "s"}</span>
+      <strong>${formatCurrency(providerRevenue)}</strong>
+    `;
+    document.querySelector(".weekly-table").append(row);
+  });
+}
+
 function getServiceCategory(serviceName) {
   const service = serviceName.toLowerCase();
   if (service.includes("sobrancelha") || service.includes("acabamento") || service.includes("higienização")) {
@@ -137,16 +425,8 @@ function getServiceCategory(serviceName) {
 }
 
 const availability = {
-  Deni: {
-    "2026-07-02": ["09:00", "10:30", "15:30", "17:00", "19:00"],
-    "2026-07-03": ["09:00", "14:00", "16:30", "19:30", "21:00"],
-    "2026-07-05": ["09:30", "10:30", "14:00", "15:30"],
-  },
-  "João Silveira": {
-    "2026-07-02": ["14:00", "15:30", "17:00", "20:00"],
-    "2026-07-03": ["14:00", "16:00", "18:30", "21:00"],
-    "2026-07-05": ["09:00", "11:00", "13:30", "15:00"],
-  },
+  Deni: ["09:00", "10:30", "14:00", "15:30", "17:00", "19:00", "20:30"],
+  "João Silveira": ["09:30", "11:00", "14:00", "15:30", "17:00", "18:30", "20:00"],
 };
 
 function goTo(viewName) {
@@ -163,6 +443,7 @@ function showToast(message) {
 }
 
 function setClientTab(tabName) {
+  document.body.dataset.activeTab = tabName;
   clientTabs.forEach((tab) => {
     tab.classList.toggle("active", tab.dataset.tab === tabName);
   });
@@ -335,16 +616,21 @@ function renderTimeSlots() {
   }
 
   const dateValue = dateInput.value;
-  const times = availability[selectedProvider][dateValue] || [];
+  const bookedTimes = getStoredAppointments()
+    .filter((appointment) => appointment.provider === selectedProvider && appointment.date === dateValue)
+    .map((appointment) => appointment.time);
+  const times = (availability[selectedProvider] || []).filter((time) => !bookedTimes.includes(time));
 
   if (!times.includes(selectedTime)) {
     selectedTime = times[0] || "";
     timeSelect.value = selectedTime;
   }
 
-  timeSlots.innerHTML = times
-    .map((time) => `<button class="time-chip${time === selectedTime ? " active" : ""}" type="button" data-time="${time}">${time}</button>`)
-    .join("");
+  timeSlots.innerHTML = times.length
+    ? times
+        .map((time) => `<button class="time-chip${time === selectedTime ? " active" : ""}" type="button" data-time="${time}">${time}</button>`)
+        .join("")
+    : `<p class="locked-hint">Todos os horários deste dia já foram reservados.</p>`;
 
   document.querySelectorAll(".time-chip").forEach((button) => {
     button.addEventListener("click", () => {
@@ -597,6 +883,7 @@ clientLoginForm.addEventListener("submit", (event) => {
     return;
   }
 
+  setClientTab("services");
   goTo("client-app");
   showToast("Login realizado. Agora é só escolher o horário.");
 });
@@ -679,35 +966,28 @@ payOptions.forEach((button) => {
 });
 
 confirmButton.addEventListener("click", () => {
-  const appointment = document.createElement("div");
   const isPaid = selectedPayment === "Pago antecipado";
-  appointment.className = `appointment ${isPaid ? "paid" : "pending"}`;
-  appointment.innerHTML = `
-    <time>${timeSelect.value}</time>
-    <div>
-      <strong>${nameInput.value || "Cliente"}</strong>
-      <span>${serviceSelect.value} com ${selectedProvider} - ${previewPrice.textContent}</span>
-    </div>
-    <em>${isPaid ? "Pago" : "Balcão"}</em>
-    <small>Confirmação no dia</small>
-  `;
+  const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+  const appointment = {
+    id: globalThis.crypto?.randomUUID?.() || String(Date.now()),
+    createdAt: new Date().toISOString(),
+    clientName: nameInput.value.trim() || "Cliente",
+    contact: phoneInput.value.trim(),
+    service: serviceSelect.value,
+    provider: selectedProvider,
+    barberId: getBarberId(selectedProvider),
+    date: dateInput.value,
+    dateLabel: selectedDateLabel,
+    time: selectedTime,
+    payment: selectedPayment,
+    price: Number(selectedOption?.dataset.price || 0),
+  };
 
-  appointmentList.prepend(appointment);
-  if (!hasAppointments) {
-    myAppointmentsList.innerHTML = "";
-    hasAppointments = true;
-  }
-
-  const myAppointment = document.createElement("article");
-  myAppointment.className = "my-appointment";
-  myAppointment.innerHTML = `
-    <div>
-      <strong>${serviceSelect.value}</strong>
-      <span>${selectedDateLabel} às ${selectedTime} com ${selectedProvider}</span>
-    </div>
-    <em>${isPaid ? "Pago antecipadamente" : "Pagar no balcão"}</em>
-  `;
-  myAppointmentsList.prepend(myAppointment);
+  const appointments = getStoredAppointments();
+  appointments.push(appointment);
+  saveStoredAppointments(appointments);
+  renderClientAppointments();
+  renderDashboard();
   completionSummary.textContent = `${serviceSelect.value} com ${selectedProvider}, ${selectedDateLabel} às ${selectedTime}. ${isPaid ? "Pagamento antecipado." : "Pagamento no balcão."}`;
   completionOverlay.classList.add("show");
   completionOverlay.setAttribute("aria-hidden", "false");
@@ -721,8 +1001,12 @@ viewAppointmentsButton.addEventListener("click", () => {
 });
 
 setAuthMode("signup");
+setClientTab("services");
 updateStepLocks();
+renderDateChips();
 renderTimeSlots();
 setStep("provider", false);
 updatePreview();
+renderClientAppointments();
+renderDashboard();
 goTo("home");

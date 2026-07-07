@@ -61,6 +61,33 @@ body::after {
   background-size: auto, auto, 96px 96px, 96px 96px;
 }
 
+body[data-active-tab="services"]::after {
+  background-image:
+    radial-gradient(circle at 18% 18%, rgba(191, 151, 82, 0.18), transparent 28rem),
+    radial-gradient(circle at 82% 8%, rgba(24, 93, 255, 0.18), transparent 34rem),
+    linear-gradient(180deg, rgba(5, 6, 8, 0.2), rgba(5, 6, 8, 0.82)),
+    linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+}
+
+body[data-active-tab="reviews"]::after {
+  background-image:
+    radial-gradient(circle at 14% 28%, rgba(248, 213, 107, 0.16), transparent 24rem),
+    radial-gradient(circle at 82% 18%, rgba(24, 93, 255, 0.16), transparent 34rem),
+    linear-gradient(180deg, rgba(5, 6, 8, 0.14), rgba(5, 6, 8, 0.82)),
+    linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+}
+
+body[data-active-tab="appointments"]::after {
+  background-image:
+    radial-gradient(circle at 16% 22%, rgba(110, 231, 255, 0.13), transparent 24rem),
+    radial-gradient(circle at 78% 18%, rgba(74, 222, 128, 0.11), transparent 28rem),
+    linear-gradient(180deg, rgba(5, 6, 8, 0.17), rgba(5, 6, 8, 0.84)),
+    linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -93,6 +120,18 @@ button {
     0 32vh 0 rgba(246, 240, 230, 0.045),
     0 64vh 0 rgba(159, 192, 255, 0.055);
   transform: rotate(-8deg);
+}
+
+body[data-active-tab="services"] .app-shell::before {
+  content: "▥   ✂   R$   ▥   ✂";
+}
+
+body[data-active-tab="reviews"] .app-shell::before {
+  content: "★   ✂   ★   ▥   ★";
+}
+
+body[data-active-tab="appointments"] .app-shell::before {
+  content: "◷   ✂   □   ◷   ▥";
 }
 
 main {
@@ -1444,12 +1483,34 @@ body[data-view="client-app"] .topbar .brand {
   gap: 14px;
 }
 
+.tab-panel[data-tab-panel="reviews"] {
+  position: relative;
+  overflow: hidden;
+  padding: 52px 46px;
+  border: 1px solid rgba(248, 213, 107, 0.14);
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(248, 213, 107, 0.08), transparent 34%),
+    linear-gradient(145deg, rgba(12, 12, 13, 0.58), rgba(7, 12, 22, 0.42));
+}
+
+.tab-panel[data-tab-panel="reviews"] .section-heading span {
+  color: #f8d56b;
+}
+
+.tab-panel[data-tab-panel="reviews"] .section-heading h2 {
+  max-width: 880px;
+  color: #fff8e4;
+}
+
 .review-card {
   min-height: 190px;
   padding: 22px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(248, 213, 107, 0.16);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.04);
+  background:
+    linear-gradient(145deg, rgba(248, 213, 107, 0.055), rgba(255, 255, 255, 0.025)),
+    rgba(255, 255, 255, 0.035);
 }
 
 .review-card strong {
@@ -1718,7 +1779,22 @@ body[data-view="client-app"] .topbar .brand {
 }
 
 .appointments-section {
-  padding-top: 34px;
+  position: relative;
+  overflow: hidden;
+  padding: 48px 46px;
+  border: 1px solid rgba(110, 231, 255, 0.14);
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(110, 231, 255, 0.08), transparent 34%),
+    linear-gradient(145deg, rgba(5, 12, 20, 0.6), rgba(5, 6, 8, 0.48));
+}
+
+.appointments-section .section-heading span {
+  color: var(--cyan);
+}
+
+.appointments-section .section-heading h2 {
+  max-width: 720px;
 }
 
 .my-appointments-list {
@@ -1733,9 +1809,11 @@ body[data-view="client-app"] .topbar .brand {
   gap: 18px;
   min-height: 84px;
   padding: 18px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(110, 231, 255, 0.15);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.035);
+  background:
+    linear-gradient(145deg, rgba(110, 231, 255, 0.045), rgba(255, 255, 255, 0.02)),
+    rgba(255, 255, 255, 0.03);
 }
 
 .my-appointment strong,
@@ -2028,6 +2106,15 @@ select:focus {
   color: #ffe788;
 }
 
+.appointment.empty {
+  grid-template-columns: 1fr;
+  color: var(--muted);
+}
+
+.appointment.empty div {
+  grid-column: 1 / -1;
+}
+
 .status.lead {
   background: rgba(77, 130, 255, 0.14);
   color: #bdd0ff;
@@ -2159,7 +2246,7 @@ select:focus {
   border-radius: 50%;
   background:
     radial-gradient(circle, #0c111c 0 48%, transparent 49%),
-    conic-gradient(var(--green) 0 64%, rgba(250, 204, 21, 0.9) 64% 100%);
+    conic-gradient(var(--green) 0 var(--paid, 0%), rgba(250, 204, 21, 0.9) var(--paid, 0%) 100%);
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
 }
 
@@ -2212,6 +2299,11 @@ select:focus {
   font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
+}
+
+.table-row.empty-row {
+  grid-template-columns: 1fr;
+  color: var(--muted);
 }
 
 .barber-panel,
@@ -2353,8 +2445,23 @@ select:focus {
 
 .public-plans {
   margin-top: 26px;
-  padding-top: 22px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 34px;
+  overflow: hidden;
+  border: 1px solid rgba(191, 151, 82, 0.18);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(191, 151, 82, 0.14), transparent 24rem),
+    linear-gradient(135deg, rgba(191, 151, 82, 0.08), transparent 38%),
+    linear-gradient(145deg, rgba(7, 8, 10, 0.68), rgba(7, 13, 24, 0.52));
+}
+
+.public-plans .section-heading span {
+  color: #d7b46f;
+}
+
+.public-plans .section-heading h2 {
+  max-width: 980px;
+  color: #fff7e6;
 }
 
 .public-plan-catalog {
@@ -2364,6 +2471,17 @@ select:focus {
 
 .public-plan-catalog .plan-card {
   min-height: 184px;
+  border-color: rgba(191, 151, 82, 0.18);
+  background:
+    linear-gradient(145deg, rgba(191, 151, 82, 0.06), rgba(255, 255, 255, 0.025)),
+    rgba(5, 7, 12, 0.5);
+}
+
+.public-plan-catalog .plan-card.featured {
+  border-color: rgba(77, 130, 255, 0.38);
+  background:
+    linear-gradient(145deg, rgba(24, 93, 255, 0.18), rgba(191, 151, 82, 0.08)),
+    rgba(5, 7, 12, 0.56);
 }
 
 .public-plan-catalog .plan-card h3 {
@@ -2784,6 +2902,9 @@ select:focus {
     align-items: center;
     flex-direction: column;
     justify-content: center;
+    gap: 6px;
+    padding-top: 7px;
+    padding-bottom: 8px;
   }
 
   .mobile-auth-actions {
@@ -2821,9 +2942,9 @@ select:focus {
   .header-shortcuts button {
     grid-column: span 2;
     justify-content: center;
-    min-height: 26px;
-    padding: 0 7px;
-    font-size: 10px;
+    min-height: 24px;
+    padding: 0 6px;
+    font-size: 9.5px;
   }
 
   .header-shortcuts button:nth-child(4),
@@ -2853,17 +2974,17 @@ select:focus {
   }
 
   .header-wordmark {
-    padding: 0 17px;
+    padding: 0 15px;
   }
 
   .header-wordmark strong {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .header-wordmark small {
     gap: 4px;
     margin-top: 2px;
-    font-size: 6px;
+    font-size: 5.5px;
     letter-spacing: 0.16em;
   }
 
@@ -3001,7 +3122,33 @@ select:focus {
   .hero,
   .section,
   .booking-panel {
-    width: min(100% - 24px, 1180px);
+    width: min(100% - 20px, 1180px);
+  }
+
+  .section {
+    padding: 28px 0;
+  }
+
+  .section.service-section {
+    padding-top: 12px;
+    padding-bottom: 22px;
+  }
+
+  .section-heading {
+    margin-bottom: 16px;
+  }
+
+  .section-heading span {
+    margin-bottom: 7px;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+
+  .section-heading h2 {
+    font-family: Inter, system-ui, sans-serif;
+    font-size: clamp(22px, 6.2vw, 30px);
+    line-height: 1.12;
+    font-weight: 850;
   }
 
   .hero-content h1 {
@@ -3023,14 +3170,30 @@ select:focus {
     grid-template-columns: 1fr;
   }
 
+  .service-gallery {
+    gap: 10px;
+    padding: 0;
+  }
+
   .service-gallery > span {
-    font-size: 18px;
+    font-size: 20px;
+    line-height: 1.15;
   }
 
   .service-photo-stack {
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 132px 104px 104px;
-    min-height: 350px;
+    grid-template-rows: 112px 96px 96px;
+    gap: 8px;
+    min-height: 312px;
+  }
+
+  .gallery-tile {
+    border-radius: 12px;
+  }
+
+  .service-gallery p {
+    font-size: 13px;
+    line-height: 1.45;
   }
 
   .tile-large {
@@ -3065,32 +3228,43 @@ select:focus {
 
   .category-head {
     min-height: auto;
-    padding: 12px;
+    padding: 11px 12px;
   }
 
   .category-head strong {
-    font-size: 19px;
+    margin-bottom: 4px;
+    font-size: 18px;
+  }
+
+  .category-head small {
+    font-size: 12px;
+  }
+
+  .category-head em {
+    padding: 5px 8px;
+    font-size: 10px;
   }
 
   .service-filters {
-    padding: 10px 12px;
+    gap: 6px;
+    padding: 9px 12px;
   }
 
   .service-filters button {
-    min-height: 30px;
-    padding: 0 11px;
-    font-size: 12px;
+    min-height: 28px;
+    padding: 0 10px;
+    font-size: 11px;
   }
 
   .service-row {
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 10px;
-    padding: 12px;
+    gap: 8px;
+    padding: 10px 12px;
   }
 
   .service-row h3 {
-    margin-bottom: 5px;
-    font-size: 16px;
+    margin-bottom: 4px;
+    font-size: 15px;
   }
 
   .service-row span,
@@ -3099,34 +3273,69 @@ select:focus {
   }
 
   .service-row button {
-    min-width: 82px;
-    min-height: 34px;
-    padding: 0 13px;
-    font-size: 12px;
+    min-width: 76px;
+    min-height: 32px;
+    padding: 0 11px;
+    font-size: 11px;
   }
 
   .public-plans {
     margin-top: 18px;
-    padding-top: 18px;
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .public-plan-catalog {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .tab-panel[data-tab-panel="reviews"],
+  .appointments-section {
+    padding: 22px 16px;
   }
 
   .public-plan-catalog .plan-card {
-    min-height: 152px;
-    padding: 14px;
+    min-height: auto;
+    padding: 13px;
+    border-radius: 12px;
   }
 
   .public-plan-catalog .plan-card h3 {
-    margin: 9px 0 6px;
-    font-size: 17px;
+    margin: 7px 0 5px;
+    font-size: 16px;
   }
 
   .public-plan-catalog .plan-card p {
     font-size: 12px;
+    line-height: 1.4;
   }
 
   .public-plan-catalog .plan-card strong {
-    margin-top: 12px;
-    font-size: 22px;
+    margin-top: 10px;
+    font-size: 20px;
+  }
+
+  .review-card {
+    min-height: auto;
+    padding: 16px;
+    border-radius: 13px;
+  }
+
+  .review-card p {
+    margin: 12px 0;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .review-card span {
+    font-size: 13px;
+  }
+
+  .appointments-section .section-heading h2,
+  .tab-panel[data-tab-panel="reviews"] .section-heading h2,
+  .public-plans .section-heading h2 {
+    max-width: 100%;
   }
 
   .client-tabs {
@@ -3515,20 +3724,164 @@ select:focus {
   }
 
   .wizard-panel {
-    padding: 18px;
+    min-height: auto;
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  .booking-band {
+    padding: 24px 0 38px;
+  }
+
+  .booking-panel {
+    width: min(100% - 20px, 1180px);
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .booking-stepper {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .step-pill {
+    min-height: 34px;
+    padding: 0 6px;
+    font-size: 10px;
+  }
+
+  .wizard-copy {
+    margin-bottom: 12px;
+  }
+
+  .wizard-copy span {
+    margin-bottom: 6px;
+    font-size: 10px;
+  }
+
+  .wizard-copy h3 {
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 20px;
+    line-height: 1.15;
+  }
+
+  .wizard-copy p {
+    margin-top: 7px;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .professional-grid {
+    gap: 8px;
+  }
+
+  .professional-card {
+    grid-template-columns: 46px 1fr;
+    min-height: 82px;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 11px;
+  }
+
+  .professional-card img {
+    width: 46px;
+    height: 46px;
+  }
+
+  .professional-card strong {
+    font-size: 15px;
+  }
+
+  .professional-card em,
+  .professional-card small {
+    font-size: 11px;
+    line-height: 1.3;
   }
 
   .date-strip {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(5, minmax(66px, 1fr));
+    gap: 7px;
+    margin-bottom: 10px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .date-strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .date-chip {
+    min-height: 68px;
+    padding: 8px;
+    border-radius: 11px;
+  }
+
+  .date-chip strong {
+    font-size: 20px;
+  }
+
+  .date-chip span,
+  .date-chip small {
+    font-size: 10px;
   }
 
   .time-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+  }
+
+  .time-chip {
+    min-height: 38px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+
+  .wizard-actions {
+    margin-top: 14px;
+  }
+
+  .wizard-actions .primary-button,
+  .wizard-actions .secondary-button {
+    min-height: 38px;
+    padding: 0 13px;
+    border-radius: 10px;
+    font-size: 12px;
   }
 
   .my-appointment {
     align-items: flex-start;
     flex-direction: column;
+    min-height: auto;
+    gap: 10px;
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  .my-appointment strong {
+    font-size: 15px;
+  }
+
+  .my-appointment span,
+  .my-appointment em {
+    font-size: 12px;
+  }
+
+  body[data-view="client-app"] .service-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  body[data-view="client-app"] .service-row h3 {
+    font-size: 15px;
+  }
+
+  body[data-view="client-app"] .service-row button {
+    min-width: 74px;
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 11px;
   }
 }
 

@@ -56,16 +56,16 @@
               <p class="auth-helper" id="authHelper">Preencha seus dados para criar sua conta e entrar no agendamento.</p>
               <label>
                 Nome
-                <input id="clientNameLogin" type="text" value="Lucas Almeida" placeholder="Seu nome" required />
+                <input id="clientNameLogin" type="text" placeholder="Seu nome" required />
               </label>
               <label>
                 Telefone ou e-mail
-                <input id="clientPhoneLogin" type="text" value="(55) 98446-2152" placeholder="(00) 9 9999-9999 ou email@email.com" required />
+                <input id="clientPhoneLogin" type="text" placeholder="(00) 9 9999-9999 ou email@email.com" required />
               </label>
               <label class="password-label">
                 Senha
                 <span class="password-field">
-                  <input id="clientPasswordLogin" type="password" value="123456" placeholder="Crie uma senha" required />
+                  <input id="clientPasswordLogin" type="password" placeholder="Crie uma senha" required />
                   <button id="togglePassword" type="button" aria-label="Mostrar senha">Ver</button>
                 </span>
               </label>
@@ -424,11 +424,11 @@
                 <option value="Taper fade" data-price="40">Taper fade - R$ 40</option>
                 <option value="Tradicional / Social" data-price="35">Tradicional / Social - R$ 35</option>
               </select>
-              <input id="dateInput" class="sr-only" type="date" value="2026-07-02" aria-hidden="true" />
-              <input id="timeSelect" class="sr-only" type="text" value="15:30" aria-hidden="true" />
-              <input id="nameInput" class="sr-only" type="text" value="Lucas Almeida" aria-hidden="true" />
-              <input id="phoneInput" class="sr-only" type="tel" value="(55) 98446-2152" aria-hidden="true" />
-              <input id="emailInput" class="sr-only" type="email" value="lucas@email.com" aria-hidden="true" />
+              <input id="dateInput" class="sr-only" type="date" aria-hidden="true" />
+              <input id="timeSelect" class="sr-only" type="text" aria-hidden="true" />
+              <input id="nameInput" class="sr-only" type="text" aria-hidden="true" />
+              <input id="phoneInput" class="sr-only" type="tel" aria-hidden="true" />
+              <input id="emailInput" class="sr-only" type="email" aria-hidden="true" />
 
               <div class="booking-stepper" aria-label="Etapas do agendamento">
                 <button class="step-pill active" type="button" data-step-target="provider">1. Profissional</button>
@@ -475,17 +475,7 @@
                     <p>Os horários mudam de acordo com o profissional escolhido.</p>
                   </div>
 
-                  <div class="date-strip" aria-label="Dias disponíveis">
-                    <button class="date-chip active" type="button" data-date="2026-07-02" data-label="02/07/2026">
-                      <span>Qui</span><strong>02</strong><small>Jul</small>
-                    </button>
-                    <button class="date-chip" type="button" data-date="2026-07-03" data-label="03/07/2026">
-                      <span>Sex</span><strong>03</strong><small>Jul</small>
-                    </button>
-                    <button class="date-chip" type="button" data-date="2026-07-05" data-label="05/07/2026">
-                      <span>Sáb</span><strong>05</strong><small>Jul</small>
-                    </button>
-                  </div>
+                  <div class="date-strip" id="dateStrip" aria-label="Dias disponíveis"></div>
 
                   <div class="time-grid" id="timeSlots" aria-label="Horários disponíveis"></div>
 
@@ -516,7 +506,7 @@
                       <h3 id="previewService">Degrade navalhado</h3>
                       <div class="preview-line">
                         <span>Você</span>
-                        <strong id="previewName">Lucas Almeida</strong>
+                        <strong id="previewName">Seu nome</strong>
                       </div>
                       <div class="preview-line">
                         <span>Profissional</span>
@@ -524,7 +514,7 @@
                       </div>
                       <div class="preview-line">
                         <span>Data e horário</span>
-                        <strong id="previewTime">02/07/2026 às 15:30</strong>
+                        <strong id="previewTime">Escolha um horário</strong>
                       </div>
                       <div class="preview-line">
                         <span>Pagamento</span>
@@ -574,50 +564,38 @@
             <div class="dashboard-grid">
               <article class="metric-card">
                 <span>Faturamento do mês</span>
-                <strong>R$ 3.840</strong>
-                <small>+18% comparado ao mês passado</small>
+                <strong>R$ 0,00</strong>
+                <small>Atualiza conforme os agendamentos confirmados</small>
               </article>
               <article class="metric-card">
                 <span>Cortes realizados</span>
-                <strong>126</strong>
-                <small>Média de 6 clientes por dia</small>
+                <strong>0</strong>
+                <small>Nenhum corte confirmado ainda</small>
               </article>
               <article class="metric-card">
                 <span>Pagos antecipadamente</span>
-                <strong id="paidTotal">R$ 1.280</strong>
+                <strong id="paidTotal">R$ 0,00</strong>
                 <small>Controle do que já entrou antes do corte</small>
               </article>
               <article class="metric-card">
                 <span>Serviço mais vendido</span>
-                <strong>Degrade</strong>
-                <small>48% dos agendamentos</small>
+                <strong>Nenhum</strong>
+                <small>Aparece quando houver agendamentos</small>
               </article>
             </div>
 
             <div class="owner-layout">
               <div class="schedule-card">
                 <div class="card-title">
-                  <h3>Agenda de amanhã</h3>
-                  <span>02 jul</span>
+                  <h3>Próximos horários</h3>
+                  <span>Hoje</span>
                 </div>
                 <div class="appointment-list" id="appointmentList">
-                  <div class="appointment paid">
-                    <time>09:00</time>
+                  <div class="appointment empty">
                     <div>
-                      <strong>Rafael Souza</strong>
-                      <span>Degrade navalhado</span>
+                      <strong>Nenhum horário confirmado ainda.</strong>
+                      <span>Quando o cliente agendar, aparece aqui.</span>
                     </div>
-                    <em>Pago</em>
-                    <small>Confirmação no dia</small>
-                  </div>
-                  <div class="appointment pending">
-                    <time>10:30</time>
-                    <div>
-                      <strong>Bruno Martins</strong>
-                      <span>Degrade / Barba</span>
-                    </div>
-                    <em>Balcão</em>
-                    <small>Confirmação no dia</small>
                   </div>
                 </div>
               </div>
@@ -628,10 +606,7 @@
                   <span>tempo real</span>
                 </div>
                 <div class="bar-chart" aria-label="Gráfico de serviços vendidos">
-                  <div style="--h: 82%"><span>Degrade</span></div>
-                  <div style="--h: 58%"><span>Barba</span></div>
-                  <div style="--h: 70%"><span>Combo</span></div>
-                  <div style="--h: 45%"><span>Plano</span></div>
+                  <div style="--h: 8%"><span>Sem dados</span></div>
                 </div>
               </div>
             </div>
@@ -643,12 +618,7 @@
                   <span>últimos 6 meses</span>
                 </div>
                 <div class="trend-chart" aria-label="Gráfico de cortes por mês">
-                  <div style="--h: 52%"><strong>88</strong><span>Fev</span></div>
-                  <div style="--h: 58%"><strong>96</strong><span>Mar</span></div>
-                  <div style="--h: 63%"><strong>104</strong><span>Abr</span></div>
-                  <div style="--h: 72%"><strong>118</strong><span>Mai</span></div>
-                  <div style="--h: 76%"><strong>126</strong><span>Jun</span></div>
-                  <div style="--h: 68%"><strong>74</strong><span>Jul</span></div>
+                  <div style="--h: 8%"><strong>0</strong><span>Atual</span></div>
                 </div>
               </article>
 
@@ -658,9 +628,9 @@
                   <span>semana atual</span>
                 </div>
                 <div class="peak-list">
-                  <div><span>09h - 11h</span><strong style="--w: 44%"></strong><em>44% de ocupação</em></div>
-                  <div><span>14h - 17h</span><strong style="--w: 71%"></strong><em>71% de ocupação</em></div>
-                  <div><span>18h - 21h</span><strong style="--w: 88%"></strong><em>88% de ocupação</em></div>
+                  <div><span>09h - 11h</span><strong style="--w: 0%"></strong><em>0 agendamentos</em></div>
+                  <div><span>14h - 17h</span><strong style="--w: 0%"></strong><em>0 agendamentos</em></div>
+                  <div><span>18h - 21h</span><strong style="--w: 0%"></strong><em>0 agendamentos</em></div>
                 </div>
               </article>
 
@@ -672,8 +642,8 @@
                 <div class="payment-donut" aria-label="Pagamentos antecipados e no balcão">
                   <div></div>
                   <ul>
-                    <li><span></span> Pago antecipadamente: 64%</li>
-                    <li><span></span> Pagar no balcão: 36%</li>
+                    <li><span></span> Pago antecipadamente: 0%</li>
+                    <li><span></span> Pagar no balcão: 0%</li>
                   </ul>
                 </div>
               </article>
@@ -692,11 +662,11 @@
                     <span>semana atual</span>
                   </div>
                   <div class="barber-metrics">
-                    <div><span>Total recebido</span><strong>R$ 1.820</strong></div>
-                    <div><span>Cortes</span><strong>46</strong></div>
-                    <div><span>Ticket médio</span><strong>R$ 39,56</strong></div>
+                    <div><span>Total recebido</span><strong>R$ 0,00</strong></div>
+                    <div><span>Cortes</span><strong>0</strong></div>
+                    <div><span>Ticket médio</span><strong>R$ 0,00</strong></div>
                   </div>
-                  <p>Mês com mais cortes: <strong>Junho</strong>, com 74 atendimentos.</p>
+                  <p>Mês com mais cortes: <strong>Sem dados ainda</strong>.</p>
                 </article>
 
                 <article class="barber-card" data-barber-card="joao">
@@ -705,11 +675,11 @@
                     <span>semana atual</span>
                   </div>
                   <div class="barber-metrics">
-                    <div><span>Total recebido</span><strong>R$ 1.320</strong></div>
-                    <div><span>Cortes</span><strong>34</strong></div>
-                    <div><span>Ticket médio</span><strong>R$ 38,82</strong></div>
+                    <div><span>Total recebido</span><strong>R$ 0,00</strong></div>
+                    <div><span>Cortes</span><strong>0</strong></div>
+                    <div><span>Ticket médio</span><strong>R$ 0,00</strong></div>
                   </div>
-                  <p>Mês com mais cortes: <strong>Maio</strong>, com 58 atendimentos.</p>
+                  <p>Mês com mais cortes: <strong>Sem dados ainda</strong>.</p>
                 </article>
               </div>
 
@@ -720,17 +690,8 @@
                   <span>Cortes</span>
                   <span>Total</span>
                 </div>
-                <div class="table-row">
-                  <span>Deni</span>
-                  <span>01/07 a 07/07</span>
-                  <span>46 cortes</span>
-                  <strong>R$ 1.820</strong>
-                </div>
-                <div class="table-row">
-                  <span>João</span>
-                  <span>01/07 a 07/07</span>
-                  <span>34 cortes</span>
-                  <strong>R$ 1.320</strong>
+                <div class="table-row empty-row">
+                  <span>Nenhum agendamento confirmado ainda.</span>
                 </div>
               </div>
             </div>
@@ -781,26 +742,8 @@
                 <span>Valor</span>
                 <span>Status</span>
               </div>
-              <div class="table-row">
-                <span>Joao Pedro</span>
-                <span>4x Cabelo + Sobrancelha + Barba + Higienização</span>
-                <span>3/4 cortes</span>
-                <span>R$ 160,00</span>
-                <strong class="status active">Ativo</strong>
-              </div>
-              <div class="table-row">
-                <span>Marcos Vinicius</span>
-                <span>2x Cabelo + Sobrancelha + Barba + Higienização</span>
-                <span>4/4 cortes</span>
-                <span>R$ 130,00</span>
-                <strong class="status renew">Renovar</strong>
-              </div>
-              <div class="table-row">
-                <span>Caio Henrique</span>
-                <span>2x Cabelo + Sobrancelha + Higienização</span>
-                <span>2 visitas</span>
-                <span>R$ 100,00</span>
-                <strong class="status lead">Ofertar plano</strong>
+              <div class="table-row empty-row">
+                <span>Nenhum cliente com plano cadastrado ainda.</span>
               </div>
             </div>
           </section>
