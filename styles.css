@@ -2351,6 +2351,29 @@ select:focus {
   line-height: 1;
 }
 
+.public-plans {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.public-plan-catalog {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-bottom: 0;
+}
+
+.public-plan-catalog .plan-card {
+  min-height: 184px;
+}
+
+.public-plan-catalog .plan-card h3 {
+  font-size: 19px;
+}
+
+.public-plan-catalog .plan-card strong {
+  font-size: 24px;
+}
+
 .manager-form {
   display: grid;
   grid-template-columns: 1fr 0.65fr 0.65fr;
@@ -2653,6 +2676,10 @@ select:focus {
   }
 
   .plan-catalog {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .public-plan-catalog {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -3078,6 +3105,30 @@ select:focus {
     font-size: 12px;
   }
 
+  .public-plans {
+    margin-top: 18px;
+    padding-top: 18px;
+  }
+
+  .public-plan-catalog .plan-card {
+    min-height: 152px;
+    padding: 14px;
+  }
+
+  .public-plan-catalog .plan-card h3 {
+    margin: 9px 0 6px;
+    font-size: 17px;
+  }
+
+  .public-plan-catalog .plan-card p {
+    font-size: 12px;
+  }
+
+  .public-plan-catalog .plan-card strong {
+    margin-top: 12px;
+    font-size: 22px;
+  }
+
   .client-tabs {
     overflow-x: auto;
     width: min(100% - 24px, 1180px);
@@ -3483,6 +3534,10 @@ select:focus {
 
 @media (max-width: 520px) {
   .service-list {
+    grid-template-columns: 1fr;
+  }
+
+  .public-plan-catalog {
     grid-template-columns: 1fr;
   }
 }

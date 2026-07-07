@@ -721,9 +721,8 @@ viewAppointmentsButton.addEventListener("click", () => {
 });
 
 setAuthMode("signup");
-setClientTab("services");
 updateStepLocks();
 renderTimeSlots();
 setStep("provider", false);
 updatePreview();
-goTo("client-app");
+goTo("home");
