@@ -844,7 +844,10 @@ body[data-view="client-app"] .topbar .brand {
 .metric-card,
 .schedule-card,
 .insight-card,
-.client-table {
+.client-table,
+.barber-card,
+.weekly-table,
+.management-card {
   border: 1px solid var(--line);
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025));
   box-shadow: var(--shadow);
@@ -2210,6 +2213,127 @@ select:focus {
   text-transform: uppercase;
 }
 
+.barber-panel,
+.management-section {
+  margin-top: 22px;
+}
+
+.barber-summary-grid,
+.management-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.barber-card,
+.management-card {
+  padding: 22px;
+  border-radius: 16px;
+}
+
+.barber-card.primary {
+  border-color: rgba(77, 130, 255, 0.32);
+  background:
+    linear-gradient(145deg, rgba(24, 93, 255, 0.13), rgba(255, 255, 255, 0.025)),
+    rgba(8, 10, 13, 0.72);
+}
+
+.barber-metrics {
+  display: grid;
+  grid-template-columns: 1.25fr 0.72fr 1fr;
+  gap: 10px;
+}
+
+.barber-metrics div {
+  min-height: 92px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.barber-metrics span,
+.inventory-list span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.barber-metrics strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--ivory);
+  font-size: clamp(22px, 3vw, 30px);
+  line-height: 1;
+}
+
+.barber-card p {
+  margin: 16px 0 0;
+  color: #c2cad8;
+  line-height: 1.45;
+}
+
+.weekly-table {
+  overflow: hidden;
+  margin-top: 18px;
+  border-radius: 16px;
+}
+
+.weekly-table .table-row {
+  grid-template-columns: 1fr 1.2fr 1fr auto;
+}
+
+.plans-section .table-row {
+  grid-template-columns: 1.2fr 1fr 0.8fr 0.8fr auto;
+}
+
+.manager-form {
+  display: grid;
+  grid-template-columns: 1fr 0.65fr 0.65fr;
+  gap: 10px;
+}
+
+.manager-form input {
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text);
+  font: inherit;
+}
+
+.manager-form input::placeholder {
+  color: #7f8999;
+}
+
+.manager-form button {
+  grid-column: 1 / -1;
+}
+
+.inventory-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.inventory-list div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.inventory-list strong {
+  color: var(--ivory);
+}
+
 .toast {
   position: fixed;
   right: 20px;
@@ -2500,11 +2624,29 @@ select:focus {
 }
 
 @media (max-width: 640px) {
+  body {
+    background: #070b13;
+  }
+
+  body::before {
+    inset: 0;
+    background:
+      radial-gradient(circle at 74% 0%, rgba(24, 93, 255, 0.18), transparent 22rem),
+      linear-gradient(180deg, #070b13 0%, #0a1324 42%, #05070c 100%);
+    filter: none;
+    transform: none;
+  }
+
+  body::after {
+    background-image:
+      linear-gradient(180deg, rgba(7, 11, 19, 0.18), rgba(5, 7, 12, 0.72)),
+      linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+    background-size: auto, 96px 96px, 96px 96px;
+  }
+
   .app-shell::before {
-    inset: 18% -20% auto -20%;
-    font-size: 88px;
-    letter-spacing: 0.28em;
-    opacity: 0.72;
+    display: none;
   }
 
   .tab-panel,
@@ -2965,13 +3107,18 @@ select:focus {
   }
 
   body[data-view="owner-dashboard"] .owner-layout,
-  body[data-view="owner-dashboard"] .analytics-grid {
+  body[data-view="owner-dashboard"] .analytics-grid,
+  body[data-view="owner-dashboard"] .barber-summary-grid,
+  body[data-view="owner-dashboard"] .management-grid {
+    grid-template-columns: 1fr;
     gap: 10px;
     margin-top: 10px;
   }
 
   body[data-view="owner-dashboard"] .schedule-card,
-  body[data-view="owner-dashboard"] .insight-card {
+  body[data-view="owner-dashboard"] .insight-card,
+  body[data-view="owner-dashboard"] .barber-card,
+  body[data-view="owner-dashboard"] .management-card {
     padding: 14px;
     border-radius: 12px;
   }
@@ -3073,6 +3220,66 @@ select:focus {
   body[data-view="owner-dashboard"] .payment-donut ul {
     gap: 8px;
     line-height: 1.3;
+  }
+
+  body[data-view="owner-dashboard"] .barber-panel,
+  body[data-view="owner-dashboard"] .management-section {
+    margin-top: 12px;
+  }
+
+  body[data-view="owner-dashboard"] .barber-metrics {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  body[data-view="owner-dashboard"] .barber-metrics div:first-child {
+    grid-column: 1 / -1;
+  }
+
+  body[data-view="owner-dashboard"] .barber-metrics div {
+    min-height: auto;
+    padding: 11px;
+  }
+
+  body[data-view="owner-dashboard"] .barber-metrics span,
+  body[data-view="owner-dashboard"] .inventory-list span {
+    font-size: 10px;
+  }
+
+  body[data-view="owner-dashboard"] .barber-metrics strong {
+    font-size: 22px;
+  }
+
+  body[data-view="owner-dashboard"] .barber-card p {
+    margin-top: 11px;
+    font-size: 12px;
+  }
+
+  body[data-view="owner-dashboard"] .weekly-table .table-row,
+  body[data-view="owner-dashboard"] .plans-section .table-row {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-view="owner-dashboard"] .manager-form {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  body[data-view="owner-dashboard"] .manager-form input {
+    min-height: 40px;
+    font-size: 12px;
+  }
+
+  body[data-view="owner-dashboard"] .inventory-list {
+    gap: 7px;
+    margin-top: 10px;
+  }
+
+  body[data-view="owner-dashboard"] .inventory-list div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+    padding: 10px;
   }
 
   .booking-panel {

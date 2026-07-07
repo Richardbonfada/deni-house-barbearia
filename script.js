@@ -18,7 +18,7 @@ const previewPrice = document.querySelector("#previewPrice");
 const previewProvider = document.querySelector("#previewProvider");
 const payOptions = document.querySelectorAll(".pay-option");
 const serviceCards = document.querySelectorAll(".service-card");
-const serviceRows = document.querySelectorAll(".service-row");
+let serviceRows = document.querySelectorAll(".service-row");
 const serviceFilterButtons = document.querySelectorAll("[data-service-filter]");
 const appointmentList = document.querySelector("#appointmentList");
 const confirmButton = document.querySelector("#confirmButton");
@@ -52,6 +52,16 @@ const viewAppointmentsButton = document.querySelector("#viewAppointmentsButton")
 const galleryOverlay = document.querySelector("#galleryOverlay");
 const closeGallery = document.querySelector("#closeGallery");
 const openGalleryButtons = document.querySelectorAll("[data-open-gallery]");
+const addServiceButton = document.querySelector("#addServiceButton");
+const addProductButton = document.querySelector("#addProductButton");
+const managedServicesList = document.querySelector("#managedServicesList");
+const managedProductsList = document.querySelector("#managedProductsList");
+const newServiceName = document.querySelector("#newServiceName");
+const newServicePrice = document.querySelector("#newServicePrice");
+const newServiceDuration = document.querySelector("#newServiceDuration");
+const newProductName = document.querySelector("#newProductName");
+const newProductPrice = document.querySelector("#newProductPrice");
+const newProductStock = document.querySelector("#newProductStock");
 
 let authMode = "signup";
 
@@ -311,6 +321,109 @@ function syncServiceCard(serviceName) {
   });
 }
 
+function openBookingForService(serviceName) {
+  serviceSelect.value = serviceName;
+  syncServiceCard(serviceName);
+  selectedProvider = "";
+  selectedTime = "";
+  timeSelect.value = "";
+  professionalCards.forEach((item) => item.classList.remove("active"));
+  updatePreview();
+  setClientTab("services");
+  bookingFlow.classList.remove("booking-flow-hidden");
+  maxUnlockedStep = 0;
+  updateStepLocks();
+  renderTimeSlots();
+  setStep("provider", true);
+}
+
+function bindServiceRow(row) {
+  row.addEventListener("click", () => openBookingForService(row.dataset.service));
+}
+
+function formatCurrencyValue(value) {
+  return Number(value || 0).toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function createInventoryItem(title, detail) {
+  const item = document.createElement("div");
+  const strong = document.createElement("strong");
+  const span = document.createElement("span");
+  strong.textContent = title;
+  span.textContent = detail;
+  item.append(strong, span);
+  return item;
+}
+
+function addManagedService() {
+  const name = newServiceName.value.trim();
+  const price = Number(newServicePrice.value);
+  const duration = Number(newServiceDuration.value);
+
+  if (!name || !price || !duration) {
+    showToast("Preencha nome, valor e duração do serviço.");
+    return;
+  }
+
+  const option = document.createElement("option");
+  option.value = name;
+  option.dataset.price = String(price);
+  option.textContent = `${name} - R$ ${price}`;
+  serviceSelect.append(option);
+
+  const row = document.createElement("article");
+  row.className = "service-row";
+  row.dataset.service = name;
+  row.dataset.price = String(price);
+  row.dataset.duration = String(duration);
+  const content = document.createElement("div");
+  const title = document.createElement("h3");
+  const time = document.createElement("span");
+  const small = document.createElement("small");
+  const button = document.createElement("button");
+  title.textContent = name;
+  time.textContent = `${duration}min`;
+  small.textContent = `a partir de R$ ${formatCurrencyValue(price)}`;
+  button.type = "button";
+  button.textContent = "Reservar";
+  content.append(title, time, small);
+  row.append(content, button);
+  serviceList.append(row);
+  bindServiceRow(row);
+  serviceRows = document.querySelectorAll(".service-row");
+  serviceList.classList.add("expanded");
+  toggleServices.setAttribute("aria-expanded", "true");
+  toggleServices.querySelector("span").textContent = "Mostrar menos serviços";
+
+  managedServicesList.prepend(createInventoryItem(name, `R$ ${formatCurrencyValue(price)} · ${duration}min`));
+
+  newServiceName.value = "";
+  newServicePrice.value = "";
+  newServiceDuration.value = "";
+  showToast("Serviço adicionado ao painel e à lista de reservas.");
+}
+
+function addManagedProduct() {
+  const name = newProductName.value.trim();
+  const price = Number(newProductPrice.value);
+  const stock = Number(newProductStock.value);
+
+  if (!name || !price || Number.isNaN(stock)) {
+    showToast("Preencha nome, valor e estoque do produto.");
+    return;
+  }
+
+  managedProductsList.prepend(createInventoryItem(name, `R$ ${formatCurrencyValue(price)} · estoque ${stock}`));
+
+  newProductName.value = "";
+  newProductPrice.value = "";
+  newProductStock.value = "";
+  showToast("Produto adicionado para venda física.");
+}
+
 document.querySelectorAll("[data-go]").forEach((button) => {
   button.addEventListener("click", () => goTo(button.dataset.go));
 });
@@ -449,22 +562,11 @@ serviceCards.forEach((card) => {
 });
 
 serviceRows.forEach((row) => {
-  row.addEventListener("click", () => {
-    serviceSelect.value = row.dataset.service;
-    syncServiceCard(row.dataset.service);
-    selectedProvider = "";
-    selectedTime = "";
-    timeSelect.value = "";
-    professionalCards.forEach((item) => item.classList.remove("active"));
-    updatePreview();
-    setClientTab("services");
-    bookingFlow.classList.remove("booking-flow-hidden");
-    maxUnlockedStep = 0;
-    updateStepLocks();
-    renderTimeSlots();
-    setStep("provider", true);
-  });
+  bindServiceRow(row);
 });
+
+addServiceButton.addEventListener("click", addManagedService);
+addProductButton.addEventListener("click", addManagedProduct);
 
 professionalCards.forEach((card) => {
   card.addEventListener("click", () => {

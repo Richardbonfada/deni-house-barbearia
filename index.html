@@ -515,7 +515,7 @@
           <div class="client-header owner-header">
             <div>
               <span class="eyebrow">Gerenciador Deni House</span>
-              <h1>Painel do Deni</h1>
+              <h1>Painel da Barbearia</h1>
             </div>
             <div class="header-actions">
               <button class="ghost-button" type="button" data-go="home">Sair</button>
@@ -630,6 +630,62 @@
                 </div>
               </article>
             </div>
+
+            <div class="barber-panel">
+              <div class="section-heading compact">
+                <span>Relatório por barbeiro</span>
+                <h2>Deni e João, lado a lado.</h2>
+              </div>
+
+              <div class="barber-summary-grid">
+                <article class="barber-card primary">
+                  <div class="card-title">
+                    <h3>Deni</h3>
+                    <span>semana atual</span>
+                  </div>
+                  <div class="barber-metrics">
+                    <div><span>Total recebido</span><strong>R$ 1.820</strong></div>
+                    <div><span>Cortes</span><strong>46</strong></div>
+                    <div><span>Ticket médio</span><strong>R$ 39,56</strong></div>
+                  </div>
+                  <p>Mês com mais cortes: <strong>Junho</strong>, com 74 atendimentos.</p>
+                </article>
+
+                <article class="barber-card">
+                  <div class="card-title">
+                    <h3>João</h3>
+                    <span>semana atual</span>
+                  </div>
+                  <div class="barber-metrics">
+                    <div><span>Total recebido</span><strong>R$ 1.320</strong></div>
+                    <div><span>Cortes</span><strong>34</strong></div>
+                    <div><span>Ticket médio</span><strong>R$ 38,82</strong></div>
+                  </div>
+                  <p>Mês com mais cortes: <strong>Maio</strong>, com 58 atendimentos.</p>
+                </article>
+              </div>
+
+              <div class="weekly-table">
+                <div class="table-row table-head">
+                  <span>Barbeiro</span>
+                  <span>Semana</span>
+                  <span>Cortes</span>
+                  <span>Total</span>
+                </div>
+                <div class="table-row">
+                  <span>Deni</span>
+                  <span>01/07 a 07/07</span>
+                  <span>46 cortes</span>
+                  <strong>R$ 1.820</strong>
+                </div>
+                <div class="table-row">
+                  <span>João</span>
+                  <span>01/07 a 07/07</span>
+                  <span>34 cortes</span>
+                  <strong>R$ 1.320</strong>
+                </div>
+              </div>
+            </div>
           </section>
 
           <section class="section plans-section">
@@ -642,26 +698,73 @@
                 <span>Cliente</span>
                 <span>Plano</span>
                 <span>Uso</span>
+                <span>Valor</span>
                 <span>Status</span>
               </div>
               <div class="table-row">
                 <span>Joao Pedro</span>
                 <span>Mensal</span>
                 <span>3/4 cortes</span>
+                <span>R$ --</span>
                 <strong class="status active">Ativo</strong>
               </div>
               <div class="table-row">
                 <span>Marcos Vinicius</span>
                 <span>Mensal</span>
                 <span>4/4 cortes</span>
+                <span>R$ --</span>
                 <strong class="status renew">Renovar</strong>
               </div>
               <div class="table-row">
                 <span>Caio Henrique</span>
                 <span>Avulso</span>
                 <span>2 visitas</span>
+                <span>R$ --</span>
                 <strong class="status lead">Ofertar plano</strong>
               </div>
+            </div>
+          </section>
+
+          <section class="section management-section">
+            <div class="section-heading compact">
+              <span>Cadastro interno</span>
+              <h2>Serviços, produtos físicos e vendas no balcão.</h2>
+            </div>
+
+            <div class="management-grid">
+              <article class="management-card">
+                <div class="card-title">
+                  <h3>Novo serviço</h3>
+                  <span>agenda</span>
+                </div>
+                <div class="manager-form">
+                  <input id="newServiceName" type="text" placeholder="Nome do serviço" />
+                  <input id="newServicePrice" type="number" min="0" placeholder="Valor em R$" />
+                  <input id="newServiceDuration" type="number" min="5" placeholder="Duração em min" />
+                  <button class="primary-button" id="addServiceButton" type="button">Adicionar serviço</button>
+                </div>
+                <div class="inventory-list" id="managedServicesList">
+                  <div><strong>Degradê navalhado</strong><span>R$ 45 · 45min</span></div>
+                  <div><strong>Social / Barba</strong><span>R$ 60 · 45min</span></div>
+                </div>
+              </article>
+
+              <article class="management-card">
+                <div class="card-title">
+                  <h3>Produto físico</h3>
+                  <span>venda balcão</span>
+                </div>
+                <div class="manager-form">
+                  <input id="newProductName" type="text" placeholder="Produto: pomada, óleo..." />
+                  <input id="newProductPrice" type="number" min="0" placeholder="Valor em R$" />
+                  <input id="newProductStock" type="number" min="0" placeholder="Estoque" />
+                  <button class="primary-button" id="addProductButton" type="button">Adicionar produto</button>
+                </div>
+                <div class="inventory-list" id="managedProductsList">
+                  <div><strong>Pomada modeladora</strong><span>R$ -- · estoque --</span></div>
+                  <div><strong>Óleo para barba</strong><span>R$ -- · estoque --</span></div>
+                </div>
+              </article>
             </div>
           </section>
         </section>
