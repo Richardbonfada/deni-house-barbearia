@@ -53,6 +53,9 @@ const viewAppointmentsButton = document.querySelector("#viewAppointmentsButton")
 const galleryOverlay = document.querySelector("#galleryOverlay");
 const closeGallery = document.querySelector("#closeGallery");
 const openGalleryButtons = document.querySelectorAll("[data-open-gallery]");
+const photoViewer = document.querySelector("#photoViewer");
+const photoViewerImage = document.querySelector("#photoViewerImage");
+const closePhotoViewer = document.querySelector("#closePhotoViewer");
 const addServiceButton = document.querySelector("#addServiceButton");
 const addProductButton = document.querySelector("#addProductButton");
 const managedServicesList = document.querySelector("#managedServicesList");
@@ -465,8 +468,23 @@ function openGallery() {
 }
 
 function closeGalleryModal() {
+  closeFullPhoto();
   galleryOverlay.classList.remove("show");
   galleryOverlay.setAttribute("aria-hidden", "true");
+}
+
+function openFullPhoto(image) {
+  photoViewerImage.src = image.src;
+  photoViewerImage.alt = image.alt;
+  photoViewer.classList.add("show");
+  photoViewer.setAttribute("aria-hidden", "false");
+}
+
+function closeFullPhoto() {
+  photoViewer.classList.remove("show");
+  photoViewer.setAttribute("aria-hidden", "true");
+  photoViewerImage.removeAttribute("src");
+  photoViewerImage.alt = "";
 }
 
 function openClientTab(tabName) {
@@ -788,8 +806,24 @@ galleryOverlay.addEventListener("click", (event) => {
   }
 });
 
+document.querySelectorAll(".gallery-modal-grid img").forEach((image) => {
+  image.addEventListener("click", () => openFullPhoto(image));
+});
+
+closePhotoViewer.addEventListener("click", closeFullPhoto);
+
+photoViewer.addEventListener("click", (event) => {
+  if (event.target === photoViewer) {
+    closeFullPhoto();
+  }
+});
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
+    if (photoViewer.classList.contains("show")) {
+      closeFullPhoto();
+      return;
+    }
     closeGalleryModal();
   }
 });

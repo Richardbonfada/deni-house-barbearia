@@ -86,17 +86,17 @@
                 <span>Cortes realizados</span>
                 <div class="service-photo-stack">
                   <button class="gallery-tile tile-large" type="button" data-open-gallery aria-label="Abrir galeria de cortes">
-                    <img src="https://images.unsplash.com/photo-1517832606299-7ae9b720a186?auto=format&fit=crop&w=900&q=80" alt="Corte masculino clássico finalizado" />
+                    <img src="./assets/cortes/corte-01.jpg" alt="Corte degradê masculino finalizado" />
                   </button>
                   <button class="gallery-tile tile-tall" type="button" data-open-gallery aria-label="Abrir galeria de cortes">
-                    <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=700&q=80" alt="Barbeiro alinhando o corte" />
+                    <img src="./assets/cortes/corte-02.jpg" alt="Corte masculino com acabamento alinhado" />
                   </button>
                   <button class="gallery-tile tile-small" type="button" data-open-gallery aria-label="Abrir galeria de cortes">
-                    <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=700&q=80" alt="Cliente fazendo barba na barbearia" />
+                    <img src="./assets/cortes/corte-03.jpg" alt="Corte moderno com textura no topo" />
                   </button>
-                  <button class="gallery-tile tile-more" type="button" data-open-gallery aria-label="Abrir mais 4 fotos de cortes">
-                    <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=700&q=80" alt="Atendimento premium em barbearia" />
-                    <strong>+4</strong>
+                  <button class="gallery-tile tile-more" type="button" data-open-gallery aria-label="Abrir fotos de cortes">
+                    <img src="./assets/cortes/corte-04.jpg" alt="Corte masculino baixo com acabamento suave" />
+                    <strong>Ver</strong>
                   </button>
                 </div>
                 <p>Algumas referências para escolher o estilo antes de reservar.</p>
@@ -301,6 +301,17 @@
               </div>
             </div>
 
+            <div class="barbershop-showcase" aria-label="Ambiente da Deni House">
+              <div>
+                <span>Ambiente Deni House</span>
+                <h2>Um espaço preparado para cortar com calma, luz boa e acabamento no detalhe.</h2>
+              </div>
+              <div class="barbershop-photos">
+                <img src="./assets/barbearia/barbearia-01.jpg" alt="Cadeira principal da Deni House Barbearia" />
+                <img src="./assets/barbearia/barbearia-02.jpg" alt="Ambiente interno da Deni House Barbearia" />
+              </div>
+            </div>
+
             <div class="public-plans" id="availablePlans">
               <div class="section-heading compact">
                 <span>Planos disponíveis</span>
@@ -349,21 +360,21 @@
             <div class="cut-carousel" aria-label="Carrossel de cortes">
               <button class="carousel-arrow" type="button" data-carousel="prev">‹</button>
               <div class="cut-track" id="cutTrack">
-                <article class="cut-card">
-                  <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=900&q=80" alt="Corte degradê em barbearia" />
-                  <strong>Degradê navalhado</strong>
+                <article class="cut-card" data-open-gallery>
+                  <img src="./assets/cortes/corte-01-wide.jpg" alt="Corte degradê em barbearia" />
+                  <strong>Degradê alinhado</strong>
                 </article>
-                <article class="cut-card">
-                  <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=900&q=80" alt="Barba alinhada em barbearia" />
-                  <strong>Barba alinhada</strong>
+                <article class="cut-card" data-open-gallery>
+                  <img src="./assets/cortes/corte-02-wide.jpg" alt="Corte masculino com acabamento lateral" />
+                  <strong>Acabamento limpo</strong>
                 </article>
-                <article class="cut-card">
-                  <img src="https://images.unsplash.com/photo-1517832606299-7ae9b720a186?auto=format&fit=crop&w=900&q=80" alt="Corte social masculino" />
-                  <strong>Social clássico</strong>
+                <article class="cut-card" data-open-gallery>
+                  <img src="./assets/cortes/corte-03-wide.jpg" alt="Corte moderno com franja texturizada" />
+                  <strong>Texturizado</strong>
                 </article>
-                <article class="cut-card">
-                  <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=900&q=80" alt="Atendimento em barbearia premium" />
-                  <strong>Acabamento fino</strong>
+                <article class="cut-card" data-open-gallery>
+                  <img src="./assets/cortes/corte-04-wide.jpg" alt="Corte baixo com degradê suave" />
+                  <strong>Low fade</strong>
                 </article>
               </div>
               <button class="carousel-arrow" type="button" data-carousel="next">›</button>
@@ -810,16 +821,17 @@
           <button type="button" id="closeGallery">Fechar</button>
         </header>
         <div class="gallery-modal-grid">
-          <img src="https://images.unsplash.com/photo-1517832606299-7ae9b720a186?auto=format&fit=crop&w=900&q=80" alt="Corte masculino clássico finalizado" />
-          <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=900&q=80" alt="Barbeiro alinhando corte com pente" />
-          <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=900&q=80" alt="Barba sendo feita na barbearia" />
-          <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=900&q=80" alt="Atendimento premium em cadeira de barbearia" />
-          <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&w=900&q=80" alt="Barbeiro fazendo acabamento" />
-          <img src="https://images.unsplash.com/photo-1605497788044-5a32c7078486?auto=format&fit=crop&w=900&q=80" alt="Profissional preparando corte" />
-          <img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=900&q=80" alt="Ferramentas de barbearia organizadas" />
-          <img src="https://images.unsplash.com/photo-1622296089863-eb7fc530daa8?auto=format&fit=crop&w=900&q=80" alt="Corte degradê em detalhe" />
+          <img src="./assets/cortes/corte-01.jpg" alt="Corte degradê masculino finalizado" />
+          <img src="./assets/cortes/corte-02.jpg" alt="Corte masculino com acabamento alinhado" />
+          <img src="./assets/cortes/corte-03.jpg" alt="Corte moderno com textura no topo" />
+          <img src="./assets/cortes/corte-04.jpg" alt="Corte masculino baixo com acabamento suave" />
         </div>
       </div>
+    </section>
+
+    <section class="photo-viewer" id="photoViewer" aria-hidden="true">
+      <button type="button" id="closePhotoViewer">Fechar</button>
+      <img id="photoViewerImage" src="" alt="" />
     </section>
 
     <div class="toast" id="toast">Agendamento criado e enviado para o painel do Deni.</div>
