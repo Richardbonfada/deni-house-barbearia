@@ -24,14 +24,34 @@
           <button type="button" data-auth-mode="login">Entrar</button>
           <button type="button" data-auth-mode="signup">Cadastrar</button>
         </div>
+        <button class="mobile-menu-button" id="mobileMenuButton" type="button" aria-label="Abrir menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
         <nav class="header-shortcuts" aria-label="Atalhos">
           <button type="button" data-tab-shortcut="services"><span>⌕</span>Serviços</button>
-          <button class="header-book-button" type="button" data-scroll-services><span>◷</span>Agendar agora</button>
+          <button class="header-book-button" type="button" data-scroll-services><span>◷</span>Agendar horário</button>
           <button type="button" data-tab-shortcut="cuts"><span>▣</span>Cortes</button>
           <button type="button" data-tab-shortcut="reviews"><span>★</span>Avaliações</button>
-          <button type="button" data-tab-shortcut="appointments"><span>□</span>Meus horários</button>
+          <button type="button" data-tab-shortcut="appointments"><span>□</span>Agendamentos</button>
         </nav>
       </header>
+
+      <aside class="mobile-side-menu" id="mobileSideMenu" aria-hidden="true">
+        <button class="mobile-menu-backdrop" type="button" data-mobile-menu-close aria-label="Fechar menu"></button>
+        <div class="mobile-menu-panel" role="dialog" aria-label="Menu de navegação">
+          <div class="mobile-menu-head">
+            <span>Deni House</span>
+            <button type="button" data-mobile-menu-close aria-label="Fechar menu">×</button>
+          </div>
+          <button type="button" data-tab-shortcut="services"><span>⌕</span>Serviços</button>
+          <button type="button" data-tab-shortcut="cuts"><span>▣</span>Cortes</button>
+          <button type="button" data-tab-shortcut="reviews"><span>★</span>Avaliações</button>
+          <button type="button" data-scroll-services><span>◷</span>Agendar horário</button>
+          <button type="button" data-tab-shortcut="appointments"><span>□</span>Agendamentos</button>
+        </div>
+      </aside>
 
       <main>
         <section class="view is-active" id="homeView">
@@ -810,6 +830,14 @@
         <span>Agendamento confirmado</span>
         <h2 id="completionTitle">Seu horário está reservado.</h2>
         <p id="completionSummary">Você pode acompanhar tudo em meus agendamentos.</p>
+        <div class="pix-box" id="pixBox" hidden>
+          <img id="pixQrImage" src="" alt="QR Code Pix para pagamento" />
+          <div>
+            <strong>Pix copia e cola</strong>
+            <textarea id="pixCopyCode" readonly rows="3" aria-label="Código Pix copia e cola"></textarea>
+            <button class="secondary-button full" id="copyPixButton" type="button">Copiar código Pix</button>
+          </div>
+        </div>
         <button class="primary-button full" id="viewAppointmentsButton" type="button">Ver meus agendamentos</button>
       </div>
     </section>

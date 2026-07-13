@@ -38,6 +38,9 @@ const cutTrack = document.querySelector("#cutTrack");
 const bookingFlow = document.querySelector("#bookingFlow");
 const toast = document.querySelector("#toast");
 const scrollServicesButtons = document.querySelectorAll("[data-scroll-services]");
+const mobileMenuButton = document.querySelector("#mobileMenuButton");
+const mobileSideMenu = document.querySelector("#mobileSideMenu");
+const mobileMenuCloseButtons = document.querySelectorAll("[data-mobile-menu-close]");
 const clientLoginForm = document.querySelector("#clientLoginForm");
 const clientNameLogin = document.querySelector("#clientNameLogin");
 const clientPhoneLogin = document.querySelector("#clientPhoneLogin");
@@ -49,7 +52,12 @@ const authTabs = document.querySelectorAll(".auth-tab");
 const togglePassword = document.querySelector("#togglePassword");
 const completionOverlay = document.querySelector("#completionOverlay");
 const completionSummary = document.querySelector("#completionSummary");
+const completionTitle = document.querySelector("#completionTitle");
 const viewAppointmentsButton = document.querySelector("#viewAppointmentsButton");
+const pixBox = document.querySelector("#pixBox");
+const pixQrImage = document.querySelector("#pixQrImage");
+const pixCopyCode = document.querySelector("#pixCopyCode");
+const copyPixButton = document.querySelector("#copyPixButton");
 const galleryOverlay = document.querySelector("#galleryOverlay");
 const closeGallery = document.querySelector("#closeGallery");
 const openGalleryButtons = document.querySelectorAll("[data-open-gallery]");
@@ -82,6 +90,11 @@ let hasAppointments = false;
 let maxUnlockedStep = 0;
 const stepOrder = ["provider", "datetime", "confirm"];
 const appointmentsStorageKey = "deniHouseAppointments";
+const remoteState = {
+  appointments: [],
+  loaded: false,
+  enabled: false,
+};
 document.querySelector('[data-tab-panel="services"]')?.after(bookingFlow);
 
 const barberAccess = [
@@ -131,6 +144,10 @@ function setOwnerDashboard(barber) {
 }
 
 function getStoredAppointments() {
+  if (remoteState.loaded) {
+    return remoteState.appointments;
+  }
+
   try {
     const parsed = JSON.parse(localStorage.getItem(appointmentsStorageKey) || "[]");
     return Array.isArray(parsed) ? parsed : [];
@@ -140,7 +157,80 @@ function getStoredAppointments() {
 }
 
 function saveStoredAppointments(appointments) {
+  remoteState.appointments = appointments;
   localStorage.setItem(appointmentsStorageKey, JSON.stringify(appointments));
+}
+
+async function apiRequest(url, options = {}) {
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.error || "Nao foi possivel completar a acao.");
+  }
+
+  return data;
+}
+
+async function loadRemoteAppointments() {
+  try {
+    const data = await apiRequest("/api/appointments");
+    remoteState.appointments = data.appointments || [];
+    remoteState.loaded = true;
+    remoteState.enabled = true;
+    localStorage.setItem(appointmentsStorageKey, JSON.stringify(remoteState.appointments));
+  } catch (error) {
+    const localAppointments = JSON.parse(localStorage.getItem(appointmentsStorageKey) || "[]");
+    remoteState.appointments = Array.isArray(localAppointments) ? localAppointments : [];
+    remoteState.loaded = true;
+    remoteState.enabled = false;
+    console.warn(error.message);
+  }
+}
+
+async function createAppointment(appointment) {
+  if (!remoteState.enabled) {
+    const appointments = getStoredAppointments();
+    appointments.push(appointment);
+    saveStoredAppointments(appointments);
+    return appointment;
+  }
+
+  const data = await apiRequest("/api/appointments", {
+    method: "POST",
+    body: JSON.stringify(appointment),
+  });
+  const savedAppointment = data.appointment;
+  const appointments = getStoredAppointments().filter((item) => item.id !== savedAppointment.id);
+  appointments.push(savedAppointment);
+  saveStoredAppointments(appointments);
+  return savedAppointment;
+}
+
+async function createPixPayment(appointment) {
+  return apiRequest("/api/create-pix", {
+    method: "POST",
+    body: JSON.stringify({ appointment }),
+  });
+}
+
+async function authenticateCustomer(action, customer) {
+  if (!remoteState.enabled) {
+    return null;
+  }
+
+  const data = await apiRequest("/api/customers", {
+    method: "POST",
+    body: JSON.stringify({ action, ...customer }),
+  });
+
+  return data.customer;
 }
 
 function formatCurrency(value) {
@@ -777,6 +867,35 @@ function addManagedProduct() {
   showToast("Produto adicionado para venda física.");
 }
 
+function resetPixBox() {
+  pixBox.hidden = true;
+  pixQrImage.removeAttribute("src");
+  pixCopyCode.value = "";
+}
+
+function showPixBox(payment) {
+  if (!payment?.qrCode || !payment?.qrCodeBase64) {
+    resetPixBox();
+    return;
+  }
+
+  pixQrImage.src = `data:image/png;base64,${payment.qrCodeBase64}`;
+  pixCopyCode.value = payment.qrCode;
+  pixBox.hidden = false;
+}
+
+function openMobileMenu() {
+  document.body.classList.add("mobile-menu-open");
+  mobileSideMenu.setAttribute("aria-hidden", "false");
+  mobileMenuButton.setAttribute("aria-expanded", "true");
+}
+
+function closeMobileMenu() {
+  document.body.classList.remove("mobile-menu-open");
+  mobileSideMenu.setAttribute("aria-hidden", "true");
+  mobileMenuButton.setAttribute("aria-expanded", "false");
+}
+
 document.querySelectorAll("[data-go]").forEach((button) => {
   button.addEventListener("click", () => goTo(button.dataset.go));
 });
@@ -788,6 +907,16 @@ document.querySelectorAll("[data-auth-mode]").forEach((button) => {
       document.querySelector(".login-card").scrollIntoView({ behavior: "smooth", block: "center" });
     }
   });
+});
+
+mobileMenuButton.addEventListener("click", openMobileMenu);
+
+mobileMenuCloseButtons.forEach((button) => {
+  button.addEventListener("click", closeMobileMenu);
+});
+
+document.querySelectorAll(".mobile-menu-panel [data-tab-shortcut], .mobile-menu-panel [data-scroll-services]").forEach((button) => {
+  button.addEventListener("click", closeMobileMenu);
 });
 
 clientTabs.forEach((tab) => {
@@ -822,6 +951,10 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     if (photoViewer.classList.contains("show")) {
       closeFullPhoto();
+      return;
+    }
+    if (document.body.classList.contains("mobile-menu-open")) {
+      closeMobileMenu();
       return;
     }
     closeGalleryModal();
@@ -891,7 +1024,7 @@ clientPhoneLogin.addEventListener("input", () => {
   clientPhoneLogin.value = formatted;
 });
 
-clientLoginForm.addEventListener("submit", (event) => {
+clientLoginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const loginName = clientNameLogin.value.trim().toLowerCase();
@@ -910,16 +1043,43 @@ clientLoginForm.addEventListener("submit", (event) => {
   phoneInput.value = clientPhoneLogin.value;
   updatePreview();
 
+  authSubmit.disabled = true;
+  authSubmit.textContent = authMode === "signup" ? "Cadastrando..." : "Entrando...";
+
   if (authMode === "signup") {
-    setAuthMode("login");
-    showToast("Cadastro feito com sucesso. Continue pelo login.");
-    clientPasswordLogin.focus();
+    try {
+      await authenticateCustomer("signup", {
+        name: clientNameLogin.value.trim(),
+        contact: clientPhoneLogin.value.trim(),
+        password: clientPasswordLogin.value.trim(),
+      });
+      setAuthMode("login");
+      showToast(remoteState.enabled ? "Cadastro salvo. Continue pelo login." : "Cadastro feito. Continue pelo login.");
+      clientPasswordLogin.focus();
+    } catch (error) {
+      showToast(error.message || "Nao foi possivel cadastrar.");
+    } finally {
+      authSubmit.disabled = false;
+      authSubmit.textContent = authMode === "signup" ? "Criar conta e agendar" : "Entrar";
+    }
     return;
   }
 
-  setClientTab("services");
-  goTo("client-app");
-  showToast("Login realizado. Agora é só escolher o horário.");
+  try {
+    await authenticateCustomer("login", {
+      name: clientNameLogin.value.trim(),
+      contact: clientPhoneLogin.value.trim(),
+      password: clientPasswordLogin.value.trim(),
+    });
+    setClientTab("services");
+    goTo("client-app");
+    showToast("Login realizado. Agora é só escolher o horário.");
+  } catch (error) {
+    showToast(error.message || "Nao foi possivel entrar.");
+  } finally {
+    authSubmit.disabled = false;
+    authSubmit.textContent = authMode === "signup" ? "Criar conta e agendar" : "Entrar";
+  }
 });
 
 serviceCards.forEach((card) => {
@@ -999,7 +1159,7 @@ payOptions.forEach((button) => {
   });
 });
 
-confirmButton.addEventListener("click", () => {
+confirmButton.addEventListener("click", async () => {
   const isPaid = selectedPayment === "Pago antecipado";
   const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
   const appointment = {
@@ -1014,18 +1174,50 @@ confirmButton.addEventListener("click", () => {
     dateLabel: selectedDateLabel,
     time: selectedTime,
     payment: selectedPayment,
+    paymentStatus: isPaid ? "pending" : "counter",
     price: Number(selectedOption?.dataset.price || 0),
+    email: emailInput.value.trim(),
   };
 
-  const appointments = getStoredAppointments();
-  appointments.push(appointment);
-  saveStoredAppointments(appointments);
-  renderClientAppointments();
-  renderDashboard();
-  completionSummary.textContent = `${serviceSelect.value} com ${selectedProvider}, ${selectedDateLabel} às ${selectedTime}. ${isPaid ? "Pagamento antecipado." : "Pagamento no balcão."}`;
-  completionOverlay.classList.add("show");
-  completionOverlay.setAttribute("aria-hidden", "false");
-  showToast("Agendamento concluído. Aviso enviado automaticamente.");
+  confirmButton.disabled = true;
+  confirmButton.textContent = "Confirmando...";
+  resetPixBox();
+
+  try {
+    const savedAppointment = await createAppointment(appointment);
+    let payment = null;
+
+    if (isPaid) {
+      confirmButton.textContent = "Gerando Pix...";
+      try {
+        payment = await createPixPayment(savedAppointment);
+        savedAppointment.paymentId = payment.paymentId;
+        savedAppointment.paymentStatus = payment.status || "pending";
+        showPixBox(payment);
+      } catch (error) {
+        completionSummary.textContent = `${serviceSelect.value} com ${selectedProvider}, ${selectedDateLabel} às ${selectedTime}. O agendamento ficou salvo, mas o Pix ainda precisa ser configurado na Vercel.`;
+        completionTitle.textContent = "Horário salvo. Pix pendente.";
+        showToast(error.message);
+      }
+    }
+
+    renderClientAppointments();
+    renderDashboard();
+
+    if (!isPaid || payment) {
+      completionTitle.textContent = isPaid ? "Pix gerado para confirmar." : "Seu horário está reservado.";
+      completionSummary.textContent = `${serviceSelect.value} com ${selectedProvider}, ${selectedDateLabel} às ${selectedTime}. ${isPaid ? "Pague pelo QR Code ou copie o código Pix." : "Pagamento no balcão."}`;
+    }
+
+    completionOverlay.classList.add("show");
+    completionOverlay.setAttribute("aria-hidden", "false");
+    showToast(isPaid ? "Agendamento salvo. Pix pronto para pagamento." : "Agendamento concluído.");
+  } catch (error) {
+    showToast(error.message || "Nao foi possivel confirmar o agendamento.");
+  } finally {
+    confirmButton.disabled = false;
+    confirmButton.textContent = "Confirmar agendamento";
+  }
 });
 
 viewAppointmentsButton.addEventListener("click", () => {
@@ -1034,13 +1226,33 @@ viewAppointmentsButton.addEventListener("click", () => {
   openInlineSection("appointments");
 });
 
-setAuthMode("signup");
-setClientTab("services");
-updateStepLocks();
-renderDateChips();
-renderTimeSlots();
-setStep("provider", false);
-updatePreview();
-renderClientAppointments();
-renderDashboard();
-goTo("home");
+copyPixButton.addEventListener("click", async () => {
+  if (!pixCopyCode.value) {
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(pixCopyCode.value);
+    showToast("Código Pix copiado.");
+  } catch {
+    pixCopyCode.select();
+    document.execCommand("copy");
+    showToast("Código Pix copiado.");
+  }
+});
+
+async function initApp() {
+  setAuthMode("signup");
+  setClientTab("services");
+  updateStepLocks();
+  renderDateChips();
+  await loadRemoteAppointments();
+  renderTimeSlots();
+  setStep("provider", false);
+  updatePreview();
+  renderClientAppointments();
+  renderDashboard();
+  goTo("home");
+}
+
+initApp();
