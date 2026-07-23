@@ -90,11 +90,13 @@ let hasAppointments = false;
 let maxUnlockedStep = 0;
 const stepOrder = ["provider", "datetime", "confirm"];
 const appointmentsStorageKey = "deniHouseAppointments";
+const customerSessionKey = "deniHouseCurrentCustomer";
 const remoteState = {
   appointments: [],
   loaded: false,
   enabled: false,
 };
+let currentCustomer = null;
 document.querySelector('[data-tab-panel="services"]')?.after(bookingFlow);
 
 const barberAccess = [
@@ -159,6 +161,27 @@ function getStoredAppointments() {
 function saveStoredAppointments(appointments) {
   remoteState.appointments = appointments;
   localStorage.setItem(appointmentsStorageKey, JSON.stringify(appointments));
+}
+
+function getContactDigits(value) {
+  return String(value || "").replace(/\D/g, "").slice(0, 11);
+}
+
+function sameContact(first, second) {
+  const firstDigits = getContactDigits(first);
+  const secondDigits = getContactDigits(second);
+  return Boolean(firstDigits && secondDigits && firstDigits === secondDigits);
+}
+
+function setCurrentCustomer(customer) {
+  currentCustomer = customer || null;
+  if (currentCustomer) {
+    localStorage.setItem(customerSessionKey, JSON.stringify(currentCustomer));
+    nameInput.value = currentCustomer.name || "";
+    phoneInput.value = currentCustomer.contact || "";
+  } else {
+    localStorage.removeItem(customerSessionKey);
+  }
 }
 
 async function apiRequest(url, options = {}) {
@@ -329,7 +352,8 @@ function renderDateChips() {
 }
 
 function renderClientAppointments() {
-  const appointments = getStoredAppointments();
+  const customerContact = currentCustomer?.contact || phoneInput.value;
+  const appointments = getStoredAppointments().filter((appointment) => sameContact(appointment.contact, customerContact));
   hasAppointments = appointments.length > 0;
 
   if (!hasAppointments) {
@@ -658,10 +682,6 @@ function formatContact(value) {
   }
 
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-}
-
-function getContactDigits(value) {
-  return String(value || "").replace(/\D/g, "");
 }
 
 function isValidMobileContact(value) {
@@ -1042,6 +1062,7 @@ clientLoginForm.addEventListener("submit", async (event) => {
   const barberLogin = getBarberByLogin(loginName, loginContact, loginPassword);
 
   if (barberLogin) {
+    setCurrentCustomer(null);
     setOwnerDashboard(barberLogin);
     goTo("owner-dashboard");
     showToast(`Bem-vindo ao gerenciador, ${barberLogin.label}.`);
@@ -1069,6 +1090,7 @@ clientLoginForm.addEventListener("submit", async (event) => {
         contact: clientPhoneLogin.value.trim(),
         password: clientPasswordLogin.value.trim(),
       });
+      setCurrentCustomer(null);
       setAuthMode("login");
       showToast("Cadastro salvo. Continue pelo login.");
       clientPasswordLogin.focus();
@@ -1082,11 +1104,13 @@ clientLoginForm.addEventListener("submit", async (event) => {
   }
 
   try {
-    await authenticateCustomer("login", {
+    const customer = await authenticateCustomer("login", {
       name: clientNameLogin.value.trim(),
       contact: clientPhoneLogin.value.trim(),
       password: clientPasswordLogin.value.trim(),
     });
+    setCurrentCustomer(customer);
+    renderClientAppointments();
     setClientTab("services");
     goTo("client-app");
     showToast("Login realizado. Agora é só escolher o horário.");
@@ -1176,13 +1200,22 @@ payOptions.forEach((button) => {
 });
 
 confirmButton.addEventListener("click", async () => {
+  if (!currentCustomer) {
+    showToast("Entre na sua conta antes de confirmar o agendamento.");
+    goTo("home");
+    setAuthMode("login");
+    document.querySelector(".login-card").scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
   const isPaid = selectedPayment === "Pago antecipado";
   const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
   const appointment = {
     id: globalThis.crypto?.randomUUID?.() || String(Date.now()),
     createdAt: new Date().toISOString(),
-    clientName: nameInput.value.trim() || "Cliente",
-    contact: phoneInput.value.trim(),
+    clientId: currentCustomer.id,
+    clientName: currentCustomer.name || nameInput.value.trim() || "Cliente",
+    contact: currentCustomer.contact || phoneInput.value.trim(),
     service: serviceSelect.value,
     provider: selectedProvider,
     barberId: getBarberId(selectedProvider),

@@ -1,5 +1,9 @@
 const { hasSupabaseConfig, json, readJsonBody, supabaseRequest } = require("./_supabase");
 
+function contactDigits(value) {
+  return String(value || "").replace(/\D/g, "").slice(0, 11);
+}
+
 function normalizeAppointment(input) {
   return {
     client_name: input.clientName || "Cliente",
@@ -44,15 +48,21 @@ module.exports = async function handler(req, res) {
 
   try {
     if (req.method === "GET") {
+      const requestUrl = new URL(req.url, `https://${req.headers.host || "localhost"}`);
+      const contact = requestUrl.searchParams.get("contact");
       const rows = await supabaseRequest("appointments?select=*&order=appointment_date.asc,appointment_time.asc");
-      return json(res, 200, { appointments: rows.map(fromDatabase) });
+      const appointments = rows.map(fromDatabase);
+      const filteredAppointments = contact
+        ? appointments.filter((appointment) => contactDigits(appointment.contact) === contactDigits(contact))
+        : appointments;
+      return json(res, 200, { appointments: filteredAppointments });
     }
 
     if (req.method === "POST") {
       const body = await readJsonBody(req);
       const appointment = normalizeAppointment(body);
 
-      if (!appointment.service || !appointment.provider || !appointment.appointment_date || !appointment.appointment_time) {
+      if (!appointment.service || !appointment.provider || !appointment.appointment_date || !appointment.appointment_time || !appointment.contact) {
         return json(res, 400, { error: "Dados do agendamento incompletos." });
       }
 
