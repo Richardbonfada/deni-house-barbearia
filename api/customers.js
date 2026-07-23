@@ -2,12 +2,21 @@ const crypto = require("crypto");
 const { hasSupabaseConfig, json, readJsonBody, supabaseRequest } = require("./_supabase");
 
 function normalizeContact(value) {
+  return String(value || "").replace(/\D/g, "").slice(0, 11);
+}
+
+function legacyNormalizeContact(value) {
   return String(value || "")
     .trim()
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/\s+/g, "");
+}
+
+function isValidMobileContact(value) {
+  const digits = normalizeContact(value);
+  return digits.length === 11 && digits[2] === "9";
 }
 
 function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
@@ -24,9 +33,14 @@ function publicCustomer(row) {
   };
 }
 
-async function findCustomer(normalizedContact) {
+async function findCustomer(normalizedContact, legacyContact = "") {
   const rows = await supabaseRequest(`customers?normalized_contact=eq.${encodeURIComponent(normalizedContact)}&select=*`);
-  return rows[0] || null;
+  if (rows[0] || !legacyContact || legacyContact === normalizedContact) {
+    return rows[0] || null;
+  }
+
+  const legacyRows = await supabaseRequest(`customers?normalized_contact=eq.${encodeURIComponent(legacyContact)}&select=*`);
+  return legacyRows[0] || null;
 }
 
 module.exports = async function handler(req, res) {
@@ -46,9 +60,14 @@ module.exports = async function handler(req, res) {
     const contact = String(body.contact || "").trim();
     const password = String(body.password || "").trim();
     const normalizedContact = normalizeContact(contact);
+    const legacyContact = legacyNormalizeContact(contact);
 
     if (!contact || !password) {
       return json(res, 400, { error: "Informe contato e senha." });
+    }
+
+    if (!isValidMobileContact(contact)) {
+      return json(res, 400, { error: "Informe um telefone valido com DDD e 9 digitos." });
     }
 
     if (action === "signup") {
@@ -56,7 +75,7 @@ module.exports = async function handler(req, res) {
         return json(res, 400, { error: "Informe o nome para cadastrar." });
       }
 
-      const existingCustomer = await findCustomer(normalizedContact);
+      const existingCustomer = await findCustomer(normalizedContact, legacyContact);
       if (existingCustomer) {
         return json(res, 409, { error: "Esse contato ja esta cadastrado. Entre pelo login." });
       }
@@ -77,7 +96,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === "login") {
-      const customer = await findCustomer(normalizedContact);
+      const customer = await findCustomer(normalizedContact, legacyContact);
       if (!customer) {
         return json(res, 401, { error: "Cadastro nao encontrado." });
       }

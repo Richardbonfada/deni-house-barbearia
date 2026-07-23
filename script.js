@@ -221,14 +221,18 @@ async function createPixPayment(appointment) {
 }
 
 async function authenticateCustomer(action, customer) {
-  if (!remoteState.enabled) {
-    return null;
+  let data;
+  try {
+    data = await apiRequest("/api/customers", {
+      method: "POST",
+      body: JSON.stringify({ action, ...customer }),
+    });
+  } catch (error) {
+    if (error instanceof TypeError || /failed to fetch|load failed|invalid url/i.test(error.message)) {
+      throw new Error("Nao consegui falar com o banco. Abra pelo link da Vercel e tente novamente.");
+    }
+    throw error;
   }
-
-  const data = await apiRequest("/api/customers", {
-    method: "POST",
-    body: JSON.stringify({ action, ...customer }),
-  });
 
   return data.customer;
 }
@@ -638,10 +642,6 @@ function setStep(stepName, shouldScroll = false) {
 }
 
 function formatContact(value) {
-  if (/[a-zA-Z@._-]/.test(value)) {
-    return value.slice(0, 80);
-  }
-
   const digits = value.replace(/\D/g, "").slice(0, 11);
 
   if (digits.length <= 2) {
@@ -658,6 +658,15 @@ function formatContact(value) {
   }
 
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+}
+
+function getContactDigits(value) {
+  return String(value || "").replace(/\D/g, "");
+}
+
+function isValidMobileContact(value) {
+  const digits = getContactDigits(value);
+  return digits.length === 11 && digits[2] === "9";
 }
 
 function getSelectedPrice() {
@@ -1028,7 +1037,7 @@ clientLoginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const loginName = clientNameLogin.value.trim().toLowerCase();
-  const loginContact = clientPhoneLogin.value.trim().toLowerCase();
+  const loginContact = clientPhoneLogin.value.trim();
   const loginPassword = clientPasswordLogin.value.trim().toLowerCase();
   const barberLogin = getBarberByLogin(loginName, loginContact, loginPassword);
 
@@ -1036,6 +1045,13 @@ clientLoginForm.addEventListener("submit", async (event) => {
     setOwnerDashboard(barberLogin);
     goTo("owner-dashboard");
     showToast(`Bem-vindo ao gerenciador, ${barberLogin.label}.`);
+    return;
+  }
+
+  if (!isValidMobileContact(clientPhoneLogin.value)) {
+    showToast("Informe um telefone valido com DDD e 9 digitos. Ex: (51) 99999-9999.");
+    clientPhoneLogin.value = formatContact(clientPhoneLogin.value);
+    clientPhoneLogin.focus();
     return;
   }
 
@@ -1054,7 +1070,7 @@ clientLoginForm.addEventListener("submit", async (event) => {
         password: clientPasswordLogin.value.trim(),
       });
       setAuthMode("login");
-      showToast(remoteState.enabled ? "Cadastro salvo. Continue pelo login." : "Cadastro feito. Continue pelo login.");
+      showToast("Cadastro salvo. Continue pelo login.");
       clientPasswordLogin.focus();
     } catch (error) {
       showToast(error.message || "Nao foi possivel cadastrar.");
