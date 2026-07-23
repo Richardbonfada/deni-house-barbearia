@@ -66,11 +66,28 @@ const photoViewerImage = document.querySelector("#photoViewerImage");
 const closePhotoViewer = document.querySelector("#closePhotoViewer");
 const addServiceButton = document.querySelector("#addServiceButton");
 const addProductButton = document.querySelector("#addProductButton");
+const addPlanButton = document.querySelector("#addPlanButton");
 const managedServicesList = document.querySelector("#managedServicesList");
 const managedProductsList = document.querySelector("#managedProductsList");
+const managedPlansList = document.querySelector("#managedPlansList");
+const ownerPlanCatalog = document.querySelector("#ownerPlanCatalog");
+const publicPlanCatalog = document.querySelector("#publicPlanCatalog");
+const planCheckout = document.querySelector("#planCheckout");
+const planCheckoutTitle = document.querySelector("#planCheckoutTitle");
+const planCheckoutDescription = document.querySelector("#planCheckoutDescription");
+const planPaymentDate = document.querySelector("#planPaymentDate");
+const planPaymentButtons = document.querySelectorAll("[data-plan-payment]");
+const planPixBox = document.querySelector("#planPixBox");
+const planPixKey = document.querySelector("#planPixKey");
+const copyPlanPixButton = document.querySelector("#copyPlanPixButton");
+const confirmPlanButton = document.querySelector("#confirmPlanButton");
 const ownerDashboardTitle = document.querySelector("#ownerDashboardTitle");
 const ownerDashboardEyebrow = document.querySelector("#ownerDashboardEyebrow");
 const barberDashboardCards = document.querySelectorAll("[data-barber-card]");
+const newPlanName = document.querySelector("#newPlanName");
+const newPlanPrice = document.querySelector("#newPlanPrice");
+const newPlanUsage = document.querySelector("#newPlanUsage");
+const newPlanDescription = document.querySelector("#newPlanDescription");
 const newServiceName = document.querySelector("#newServiceName");
 const newServicePrice = document.querySelector("#newServicePrice");
 const newServiceDuration = document.querySelector("#newServiceDuration");
@@ -81,6 +98,8 @@ const newProductStock = document.querySelector("#newProductStock");
 let authMode = "signup";
 
 let selectedPayment = "Pago antecipado";
+let selectedPlanPayment = "Pix";
+let selectedPlan = null;
 let selectedProvider = "";
 let selectedDateLabel = "";
 let selectedTime = "";
@@ -91,6 +110,7 @@ let maxUnlockedStep = 0;
 const stepOrder = ["provider", "datetime", "confirm"];
 const appointmentsStorageKey = "deniHouseAppointments";
 const customerSessionKey = "deniHouseCurrentCustomer";
+const deniPixKey = "";
 const remoteState = {
   appointments: [],
   loaded: false,
@@ -241,6 +261,46 @@ async function createPixPayment(appointment) {
     method: "POST",
     body: JSON.stringify({ appointment }),
   });
+}
+
+async function saveCatalogItem(item) {
+  try {
+    const data = await apiRequest("/api/catalog", {
+      method: "POST",
+      body: JSON.stringify(item),
+    });
+    return data.item;
+  } catch (error) {
+    console.warn(error.message);
+    return null;
+  }
+}
+
+async function savePlanOrder(order) {
+  const data = await apiRequest("/api/plan-orders", {
+    method: "POST",
+    body: JSON.stringify(order),
+  });
+  return data.order;
+}
+
+async function loadCatalogItems() {
+  try {
+    const data = await apiRequest("/api/catalog");
+    (data.items || []).forEach((item) => {
+      if (item.type === "plan") {
+        addPlanToInterface(item);
+      }
+      if (item.type === "service") {
+        addServiceToInterface(item);
+      }
+      if (item.type === "product") {
+        addProductToInterface(item);
+      }
+    });
+  } catch (error) {
+    console.warn(error.message);
+  }
 }
 
 async function authenticateCustomer(action, customer) {
@@ -830,7 +890,125 @@ function createInventoryItem(title, detail) {
   return item;
 }
 
-function addManagedService() {
+function createPlanCard(name, description, price) {
+  const card = document.createElement("article");
+  const type = document.createElement("span");
+  const title = document.createElement("h3");
+  const details = document.createElement("p");
+  const amount = document.createElement("strong");
+
+  card.className = "plan-card";
+  card.tabIndex = 0;
+  card.setAttribute("role", "button");
+  card.dataset.planName = name;
+  card.dataset.planDescription = description || "Cabelo + Sobrancelha inclusa no pacote";
+  card.dataset.planPrice = String(price);
+  type.textContent = "Plano mensal";
+  title.textContent = name;
+  details.textContent = description || "Cabelo + Sobrancelha inclusa no pacote";
+  amount.textContent = `R$ ${formatCurrencyValue(price)}`;
+  card.append(type, title, details, amount);
+  return card;
+}
+
+function hasInventoryItem(list, name) {
+  return Array.from(list?.querySelectorAll("strong") || []).some((item) => item.textContent.trim().toLowerCase() === name.toLowerCase());
+}
+
+function hasPlanCard(container, name) {
+  return Array.from(container?.querySelectorAll("h3") || []).some((item) => item.textContent.trim().toLowerCase() === name.toLowerCase());
+}
+
+function addPlanToInterface({ name, description, price, visitsPerMonth }) {
+  const usage = Number(visitsPerMonth || 1);
+  const detail = `R$ ${formatCurrencyValue(price)} · ${usage} corte${usage === 1 ? "" : "s"}/mês`;
+
+  if (!hasPlanCard(ownerPlanCatalog, name)) {
+    ownerPlanCatalog?.prepend(createPlanCard(name, description, price));
+  }
+  if (!hasPlanCard(publicPlanCatalog, name)) {
+    publicPlanCatalog?.prepend(createPlanCard(name, description, price));
+  }
+  preparePlanCards();
+  if (!hasInventoryItem(managedPlansList, name)) {
+    managedPlansList?.prepend(createInventoryItem(name, detail));
+  }
+}
+
+function addServiceToInterface({ name, price, duration }) {
+  const hasService = Array.from(serviceSelect.options).some((option) => option.value.toLowerCase() === name.toLowerCase());
+
+  if (!hasService) {
+    const option = document.createElement("option");
+    option.value = name;
+    option.dataset.price = String(price);
+    option.textContent = `${name} - R$ ${price}`;
+    serviceSelect.append(option);
+  }
+
+  if (!Array.from(serviceList.querySelectorAll(".service-row")).some((row) => row.dataset.service?.toLowerCase() === name.toLowerCase())) {
+    const row = document.createElement("article");
+    row.className = "service-row";
+    row.dataset.service = name;
+    row.dataset.price = String(price);
+    row.dataset.duration = String(duration || 30);
+    const content = document.createElement("div");
+    const title = document.createElement("h3");
+    const time = document.createElement("span");
+    const small = document.createElement("small");
+    const button = document.createElement("button");
+    title.textContent = name;
+    time.textContent = `${duration || 30}min`;
+    small.textContent = `a partir de R$ ${formatCurrencyValue(price)}`;
+    button.type = "button";
+    button.textContent = "Reservar";
+    content.append(title, time, small);
+    row.append(content, button);
+    serviceList.append(row);
+    bindServiceRow(row);
+    serviceRows = document.querySelectorAll(".service-row");
+  }
+
+  if (!hasInventoryItem(managedServicesList, name)) {
+    managedServicesList?.prepend(createInventoryItem(name, `R$ ${formatCurrencyValue(price)} · ${duration || 30}min`));
+  }
+}
+
+function addProductToInterface({ name, price, stock }) {
+  if (!hasInventoryItem(managedProductsList, name)) {
+    managedProductsList?.prepend(createInventoryItem(name, `R$ ${formatCurrencyValue(price)} · estoque ${stock ?? 0}`));
+  }
+}
+
+async function addManagedPlan() {
+  const name = newPlanName.value.trim();
+  const price = Number(newPlanPrice.value);
+  const usage = Number(newPlanUsage.value);
+  const description = newPlanDescription.value.trim() || "Cabelo + Sobrancelha inclusa no pacote";
+
+  if (!name || !price || !usage) {
+    showToast("Preencha nome, valor e quantidade de cortes do plano.");
+    return;
+  }
+
+  addPlanToInterface({ name, description, price, visitsPerMonth: usage });
+
+  await saveCatalogItem({
+    type: "plan",
+    name,
+    price,
+    visitsPerMonth: usage,
+    description,
+  });
+
+  newPlanName.value = "";
+  newPlanPrice.value = "";
+  newPlanUsage.value = "";
+  newPlanDescription.value = "";
+  showToast("Plano adicionado ao gerenciamento.");
+}
+
+async function addManagedService() {
   const name = newServiceName.value.trim();
   const price = Number(newServicePrice.value);
   const duration = Number(newServiceDuration.value);
@@ -840,37 +1018,18 @@ function addManagedService() {
     return;
   }
 
-  const option = document.createElement("option");
-  option.value = name;
-  option.dataset.price = String(price);
-  option.textContent = `${name} - R$ ${price}`;
-  serviceSelect.append(option);
-
-  const row = document.createElement("article");
-  row.className = "service-row";
-  row.dataset.service = name;
-  row.dataset.price = String(price);
-  row.dataset.duration = String(duration);
-  const content = document.createElement("div");
-  const title = document.createElement("h3");
-  const time = document.createElement("span");
-  const small = document.createElement("small");
-  const button = document.createElement("button");
-  title.textContent = name;
-  time.textContent = `${duration}min`;
-  small.textContent = `a partir de R$ ${formatCurrencyValue(price)}`;
-  button.type = "button";
-  button.textContent = "Reservar";
-  content.append(title, time, small);
-  row.append(content, button);
-  serviceList.append(row);
-  bindServiceRow(row);
-  serviceRows = document.querySelectorAll(".service-row");
+  addServiceToInterface({ name, price, duration });
   serviceList.classList.add("expanded");
   toggleServices.setAttribute("aria-expanded", "true");
   toggleServices.querySelector("span").textContent = "Mostrar menos serviços";
 
-  managedServicesList.prepend(createInventoryItem(name, `R$ ${formatCurrencyValue(price)} · ${duration}min`));
+  await saveCatalogItem({
+    type: "service",
+    name,
+    price,
+    duration,
+    description: `${duration}min`,
+  });
 
   newServiceName.value = "";
   newServicePrice.value = "";
@@ -878,7 +1037,7 @@ function addManagedService() {
   showToast("Serviço adicionado ao painel e à lista de reservas.");
 }
 
-function addManagedProduct() {
+async function addManagedProduct() {
   const name = newProductName.value.trim();
   const price = Number(newProductPrice.value);
   const stock = Number(newProductStock.value);
@@ -888,7 +1047,15 @@ function addManagedProduct() {
     return;
   }
 
-  managedProductsList.prepend(createInventoryItem(name, `R$ ${formatCurrencyValue(price)} · estoque ${stock}`));
+  addProductToInterface({ name, price, stock });
+
+  await saveCatalogItem({
+    type: "product",
+    name,
+    price,
+    stock,
+    description: "Venda física no balcão",
+  });
 
   newProductName.value = "";
   newProductPrice.value = "";
@@ -911,6 +1078,99 @@ function showPixBox(payment) {
   pixQrImage.src = `data:image/png;base64,${payment.qrCodeBase64}`;
   pixCopyCode.value = payment.qrCode;
   pixBox.hidden = false;
+}
+
+function getPlanFromCard(card) {
+  const title = card.querySelector("h3")?.textContent.trim() || "";
+  const description = card.querySelector("p")?.textContent.trim() || "";
+  const priceText = card.querySelector("strong")?.textContent || "0";
+  const price = Number(priceText.replace(/[^\d,]/g, "").replace(",", "."));
+  return {
+    name: card.dataset.planName || title,
+    description: card.dataset.planDescription || description,
+    price: Number(card.dataset.planPrice || price || 0),
+  };
+}
+
+function preparePlanCards() {
+  publicPlanCatalog.querySelectorAll(".plan-card").forEach((card) => {
+    const plan = getPlanFromCard(card);
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.dataset.planName = plan.name;
+    card.dataset.planDescription = plan.description;
+    card.dataset.planPrice = String(plan.price);
+  });
+}
+
+function updatePlanPaymentView() {
+  planPaymentButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.planPayment === selectedPlanPayment);
+  });
+
+  const isPix = selectedPlanPayment === "Pix";
+  planPixBox.hidden = !isPix;
+  planPixKey.value = isPix ? deniPixKey || "Chave Pix ainda nao informada" : "";
+  copyPlanPixButton.disabled = !deniPixKey;
+}
+
+function openPlanCheckout(plan) {
+  if (!currentCustomer) {
+    setAuthMode("login");
+    document.querySelector(".login-card").scrollIntoView({ behavior: "smooth", block: "center" });
+    showToast("Entre ou cadastre-se para escolher um plano.");
+    return;
+  }
+
+  selectedPlan = plan;
+  planCheckoutTitle.textContent = plan.name;
+  planCheckoutDescription.textContent = `${plan.description} · R$ ${formatCurrencyValue(plan.price)}`;
+  const today = toIsoDate(new Date());
+  planPaymentDate.min = today;
+  planPaymentDate.value = planPaymentDate.value || today;
+  planCheckout.hidden = false;
+  updatePlanPaymentView();
+  scrollToSection(planCheckout);
+}
+
+async function confirmPlanOrder() {
+  if (!selectedPlan) {
+    showToast("Escolha um plano primeiro.");
+    return;
+  }
+
+  if (!planPaymentDate.value) {
+    showToast("Escolha o dia para acertar o plano.");
+    planPaymentDate.focus();
+    return;
+  }
+
+  if (selectedPlanPayment === "Pix" && !deniPixKey) {
+    showToast("Me envie a chave Pix do Deni para liberar pagamento por Pix.");
+    return;
+  }
+
+  confirmPlanButton.disabled = true;
+  confirmPlanButton.textContent = "Salvando plano...";
+
+  try {
+    await savePlanOrder({
+      customerName: currentCustomer?.name || nameInput.value,
+      contact: currentCustomer?.contact || phoneInput.value,
+      planName: selectedPlan.name,
+      planDescription: selectedPlan.description,
+      price: selectedPlan.price,
+      settlementDate: planPaymentDate.value,
+      paymentMethod: selectedPlanPayment,
+      pixKey: selectedPlanPayment === "Pix" ? deniPixKey : "",
+    });
+    showToast(selectedPlanPayment === "Pix" ? "Plano marcado. Copie a chave Pix para acertar." : "Plano marcado para acertar no balcão.");
+  } catch (error) {
+    showToast(error.message || "Nao foi possivel salvar o plano agora.");
+  } finally {
+    confirmPlanButton.disabled = false;
+    confirmPlanButton.textContent = "Confirmar interesse no plano";
+  }
 }
 
 function openMobileMenu() {
@@ -944,8 +1204,19 @@ mobileMenuCloseButtons.forEach((button) => {
   button.addEventListener("click", closeMobileMenu);
 });
 
-document.querySelectorAll(".mobile-menu-panel [data-tab-shortcut], .mobile-menu-panel [data-scroll-services]").forEach((button) => {
+document.querySelectorAll(".mobile-menu-panel [data-tab-shortcut], .mobile-menu-panel [data-scroll-services], .mobile-menu-panel [data-owner-management], .mobile-menu-panel [data-go]").forEach((button) => {
   button.addEventListener("click", closeMobileMenu);
+});
+
+document.querySelectorAll("[data-owner-management]").forEach((button) => {
+  button.addEventListener("click", () => {
+    if (document.body.dataset.view !== "owner-dashboard") {
+      setAuthMode("login");
+      document.querySelector(".login-card").scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    scrollToSection(document.querySelector("#ownerManagement"));
+  });
 });
 
 clientTabs.forEach((tab) => {
@@ -1023,6 +1294,49 @@ document.querySelectorAll("[data-carousel]").forEach((button) => {
     cutTrack.scrollBy({ left: direction * 320, behavior: "smooth" });
   });
 });
+
+publicPlanCatalog.addEventListener("click", (event) => {
+  const card = event.target.closest(".plan-card");
+  if (card) {
+    openPlanCheckout(getPlanFromCard(card));
+  }
+});
+
+publicPlanCatalog.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") {
+    return;
+  }
+  const card = event.target.closest(".plan-card");
+  if (card) {
+    event.preventDefault();
+    openPlanCheckout(getPlanFromCard(card));
+  }
+});
+
+planPaymentButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    selectedPlanPayment = button.dataset.planPayment;
+    updatePlanPaymentView();
+  });
+});
+
+copyPlanPixButton.addEventListener("click", async () => {
+  if (!deniPixKey) {
+    showToast("Me envie a chave Pix do Deni para ativar este botão.");
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(deniPixKey);
+    showToast("Chave Pix copiada.");
+  } catch {
+    planPixKey.select();
+    document.execCommand("copy");
+    showToast("Chave Pix copiada.");
+  }
+});
+
+confirmPlanButton.addEventListener("click", confirmPlanOrder);
 
 scrollServicesButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -1134,6 +1448,7 @@ serviceRows.forEach((row) => {
   bindServiceRow(row);
 });
 
+addPlanButton.addEventListener("click", addManagedPlan);
 addServiceButton.addEventListener("click", addManagedService);
 addProductButton.addEventListener("click", addManagedProduct);
 
@@ -1295,7 +1610,9 @@ async function initApp() {
   setClientTab("services");
   updateStepLocks();
   renderDateChips();
+  preparePlanCards();
   await loadRemoteAppointments();
+  await loadCatalogItems();
   renderTimeSlots();
   setStep("provider", false);
   updatePreview();

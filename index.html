@@ -35,6 +35,8 @@
           <button type="button" data-tab-shortcut="cuts"><span>▣</span>Cortes</button>
           <button type="button" data-tab-shortcut="reviews"><span>★</span>Avaliações</button>
           <button type="button" data-tab-shortcut="appointments"><span>□</span>Agendamentos</button>
+          <button class="owner-menu-only" type="button" data-owner-management><span>▦</span>Meu gerenciamento</button>
+          <button class="owner-menu-only" type="button" data-go="home"><span>↩</span>Sair</button>
         </nav>
       </header>
 
@@ -56,6 +58,8 @@
           <button type="button" data-tab-shortcut="reviews"><span>★</span>Avaliações</button>
           <button type="button" data-scroll-services><span>◷</span>Agendar horário</button>
           <button type="button" data-tab-shortcut="appointments"><span>□</span>Agendamentos</button>
+          <button class="owner-menu-only" type="button" data-owner-management><span>▦</span>Meu gerenciamento</button>
+          <button class="owner-menu-only" type="button" data-go="home"><span>↩</span>Sair</button>
         </div>
       </aside>
 
@@ -343,7 +347,7 @@
                 <span>Planos disponíveis</span>
                 <h2>Escolha um plano mensal para manter o corte sempre em dia.</h2>
               </div>
-              <div class="plan-catalog public-plan-catalog">
+              <div class="plan-catalog public-plan-catalog" id="publicPlanCatalog">
                 <article class="plan-card featured">
                   <span>Plano mensal</span>
                   <h3>2 cortes por mês</h3>
@@ -356,6 +360,29 @@
                   <p>Cabelo + Sobrancelha inclusa no pacote</p>
                   <strong>R$ 145,00</strong>
                 </article>
+              </div>
+              <div class="plan-checkout" id="planCheckout" hidden>
+                <div>
+                  <span>Plano selecionado</span>
+                  <h3 id="planCheckoutTitle">2 cortes por mês</h3>
+                  <p id="planCheckoutDescription">Cabelo + Sobrancelha inclusa no pacote</p>
+                </div>
+                <div class="plan-checkout-grid">
+                  <label>
+                    Dia para acertar
+                    <input id="planPaymentDate" type="date" />
+                  </label>
+                  <div class="plan-payment-options" role="group" aria-label="Forma de pagamento do plano">
+                    <button class="active" type="button" data-plan-payment="Pix">Pix agora</button>
+                    <button type="button" data-plan-payment="Balcão">Acertar no balcão</button>
+                  </div>
+                </div>
+                <div class="plan-pix-box" id="planPixBox">
+                  <strong>Chave Pix do Deni</strong>
+                  <textarea id="planPixKey" readonly rows="2" aria-label="Chave Pix do Deni"></textarea>
+                  <button class="secondary-button full" id="copyPlanPixButton" type="button">Copiar chave Pix</button>
+                </div>
+                <button class="primary-button full" id="confirmPlanButton" type="button">Confirmar interesse no plano</button>
               </div>
             </div>
           </section>
@@ -579,7 +606,12 @@
             </div>
           </div>
 
-          <section class="section dashboard-section">
+          <section class="section dashboard-section" id="ownerManagement">
+            <div class="section-heading compact owner-management-heading">
+              <span>Meu gerenciamento</span>
+              <h2>Relatórios, agenda, planos, serviços e produtos da barbearia.</h2>
+            </div>
+
             <div class="dashboard-grid">
               <article class="metric-card">
                 <span>Faturamento do mês</span>
@@ -721,7 +753,7 @@
               <span>Clientes e planos</span>
               <h2>Controle de recorrência e oportunidades.</h2>
             </div>
-            <div class="plan-catalog">
+            <div class="plan-catalog" id="ownerPlanCatalog">
               <article class="plan-card featured">
                 <span>Plano mensal</span>
                 <h3>2 cortes por mês</h3>
@@ -756,6 +788,24 @@
             </div>
 
             <div class="management-grid">
+              <article class="management-card">
+                <div class="card-title">
+                  <h3>Novo plano</h3>
+                  <span>mensalidade</span>
+                </div>
+                <div class="manager-form plan-manager-form">
+                  <input id="newPlanName" type="text" placeholder="Nome: 2 cortes por mês" />
+                  <input id="newPlanPrice" type="number" min="0" placeholder="Valor em R$" />
+                  <input id="newPlanUsage" type="number" min="1" placeholder="Cortes/mês" />
+                  <input id="newPlanDescription" type="text" placeholder="Inclui sobrancelha, barba..." />
+                  <button class="primary-button" id="addPlanButton" type="button">Adicionar plano</button>
+                </div>
+                <div class="inventory-list" id="managedPlansList">
+                  <div><strong>2 cortes por mês</strong><span>R$ 90,00 · sobrancelha inclusa</span></div>
+                  <div><strong>4 cortes por mês</strong><span>R$ 145,00 · sobrancelha inclusa</span></div>
+                </div>
+              </article>
+
               <article class="management-card">
                 <div class="card-title">
                   <h3>Novo serviço</h3>
